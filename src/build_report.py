@@ -844,7 +844,8 @@ def build_report():
         doc,
         "The ACF and PACF profiles (Figure 6.3) show a sharp PACF cutoff after lag 1 (0.678 on raw AQI), suggesting low-order AR dynamics. "
         "Upon differencing (d=1), negative ACF spikes appear at lags 1 and 2 (-0.152, -0.170) alongside negative PACF across lags 1–9—an "
-        "over-differencing signature—coupled with weak daily lag-365 autocorrelation (r = 0.0816 just above the +/-0.0592 Bartlett band). "
+        "over-differencing signature—while daily lag-365 autocorrelation is r = 0.0816 (band ±0.0592), slightly above the 95% band; "
+        "yearly seasonality is weak in the raw ACF but clear in STL and monthly means. "
         "Accordingly, both d=0 (stationary with deterministic Fourier harmonics) and d=1 were systematically tested during Phase 5 grid search."
     )
     add_figure(

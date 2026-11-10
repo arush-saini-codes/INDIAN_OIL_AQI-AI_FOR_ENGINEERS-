@@ -518,9 +518,9 @@ Phase 3 executes the complete data preparation and feature engineering pipeline 
    - Differenced AQI ($d=1$): ADF stat $= -14.8172$ ($p = 1.99 \times 10^{-27}$), KPSS stat $= 0.0856$ ($p = 0.10$).
    - *Verdict:* Series is stationary per ADF and KPSS after first differencing ($d=1$).
 8. **Long-Lag ACF & Over-Differencing Signature (Train only):**
-   - The exact autocorrelation at lag 365 is **$r = 0.0816$**, just above the 95% Bartlett confidence band ($\pm 0.0592$). Annual seasonality is visible in STL and monthly averages, but produces modest linear autocorrelation in daily ACF.
+   - The exact autocorrelation at lag 365 is **$r = 0.0816$** (band $\pm 0.0592$), slightly above the 95% band; yearly seasonality is weak in the raw ACF but clear in STL and monthly means.
    - The differenced series exhibits negative ACF at lags 1 and 2 ($-0.152, -0.170$) and prolonged negative PACF across lags 1 through 9. This is a classic **over-differencing signature**.
-   - Together with ADF rejecting a unit root on raw AQI ($p = 1.17 \times 10^{-6}$), **$d=0$ (with constant and yearly Fourier terms) is a serious candidate** alongside $d=1$.
+   - Together with ADF rejecting a unit root on raw AQI ($p = 9.05 \times 10^{-7}$), **$d=0$ (with constant and yearly Fourier terms) is a serious candidate** alongside $d=1$.
 9. **COVID-19 Lockdown Impact:**
    - Primary combustion pollutants fell drastically: $\text{NO}_2$ dropped by $-52.24\%$, $\text{PM}_{2.5}$ by $-46.56\%$, AQI by $-17.40\%$.
    - Surface Ozone ($\text{O}_3$) surged by **$+42.11\%$**, which is consistent with the urban VOC-limited regime where reduced NO slows ozone titration ($\text{NO} + \text{O}_3 \rightarrow \text{NO}_2 + \text{O}_2$).
