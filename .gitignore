@@ -19,10 +19,13 @@ data/raw/*.zip
 *.log
 !outputs/results/p6_training.log
 
-# Model Checkpoints & Large Binary Artifacts
+# Model Checkpoints & Artifacts (track all saved models < 25 MB; exclude any oversized binaries)
 outputs/models/*
 !outputs/models/.gitkeep
 !outputs/models/dl_config.json
+!outputs/models/*.joblib
+!outputs/models/*.keras
+!outputs/models/arima_final.pkl
 
 # IDE & Editor Folders
 .vscode/
