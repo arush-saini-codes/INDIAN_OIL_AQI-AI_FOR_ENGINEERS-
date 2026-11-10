@@ -354,6 +354,7 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
     # -------------------------------------------------------------
     # Fig 2: 2x2 Grid Comparison (Classical vs DL x Univariate vs Multivariate)
     # -------------------------------------------------------------
+    from decimal import Decimal, ROUND_HALF_UP
     grid_data = np.array([
         [m_test.loc['Pure ARIMA', 'RMSE'], m_test.loc['ARIMAX', 'RMSE']],
         [m_test.loc['LSTM (univariate)', 'RMSE'], m_test.loc['LSTM (multivariate)', 'RMSE']]
@@ -363,7 +364,8 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
     for i in range(2):
         for j in range(2):
             val = grid_data[i, j]
-            label = f"{val:.2f}\nRMSE"
+            val_str = str(Decimal(str(val)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
+            label = f"{val_str}\nRMSE"
             ax.text(j, i, label, ha='center', va='center', fontsize=13, fontweight='bold',
                     color='white' if val < 28 else 'black')
 
@@ -396,6 +398,8 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
     a100 = alert_df[alert_df['threshold'] == 100].set_index('model')
     a200 = alert_df[alert_df['threshold'] == 200].set_index('model')
 
+    n_actual_100 = int(a100['actual_alerts'].iloc[0])
+    n_actual_200 = int(a200['actual_alerts'].iloc[0])
     x = np.arange(len(a100))
     w = 0.25
     ax1.bar(x - w, a100['Precision'], w, label='Precision', color='#2ca02c')
@@ -404,7 +408,7 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
     ax1.set_xticks(x)
     ax1.set_xticklabels(a100.index, rotation=20, ha='right')
     ax1.set_ylabel("Score (0 to 1)")
-    ax1.set_title("AQI > 100 Alert Evaluation (Moderate+ Days, N=51 Actual)", fontweight='bold')
+    ax1.set_title(f"AQI > 100 Alert Evaluation (Moderate+ Days, N={n_actual_100} Actual)", fontweight='bold')
     ax1.legend(frameon=True, facecolor='white')
     ax1.set_ylim([0, 1.05])
     ax1.grid(True, linestyle=':', alpha=0.6)
@@ -415,7 +419,7 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
     ax2.set_xticks(x)
     ax2.set_xticklabels(a200.index, rotation=20, ha='right')
     ax2.set_ylabel("Score (0 to 1)")
-    ax2.set_title("AQI > 200 Alert Evaluation (Poor+ Days, N=4 Actual, Small Sample)", fontweight='bold')
+    ax2.set_title(f"AQI > 200 Alert Evaluation (Poor+ Days, N={n_actual_200} Actual, Small Sample)", fontweight='bold')
     ax2.legend(frameon=True, facecolor='white')
     ax2.set_ylim([0, 1.05])
     ax2.grid(True, linestyle=':', alpha=0.6)
@@ -447,10 +451,13 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
     # -------------------------------------------------------------
     fig, ax = plt.subplots(figsize=(8, 4.5), dpi=300)
     s_df = spike_df.set_index('model')
+    q90_thresh = float(test_preds[test_preds['model'] == 'ARIMAX']['actual'].quantile(0.90))
+    n_norm = int(s_df['normal_count'].iloc[0])
+    n_spike = int(s_df['spike_count'].iloc[0])
     x = np.arange(len(s_df))
     w = 0.35
-    ax.bar(x - w/2, s_df['normal_RMSE'], w, label='Normal Days (Bottom 90%, N=163)', color='#1f77b4', alpha=0.85)
-    ax.bar(x + w/2, s_df['spike_RMSE'], w, label='Spike Days (Top 10%, N=19, AQI ≥ 148)', color='#d62728', alpha=0.85)
+    ax.bar(x - w/2, s_df['normal_RMSE'], w, label=f'Normal Days (Bottom 90%, N={n_norm})', color='#1f77b4', alpha=0.85)
+    ax.bar(x + w/2, s_df['spike_RMSE'], w, label=f'Spike Days (Top 10%, N={n_spike}, AQI ≥ {q90_thresh:.1f})', color='#d62728', alpha=0.85)
     ax.set_xticks(x)
     ax.set_xticklabels(s_df.index, rotation=20, ha='right')
     ax.set_ylabel("RMSE (AQI)")
@@ -497,8 +504,9 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
 
     # Mark Diwali 2019
     diwali_date = pd.Timestamp('2019-10-27')
+    diwali_aqi = float(arimax_sub.loc[arimax_sub['date'] == diwali_date, 'actual'].iloc[0])
     ax.axvline(diwali_date, color='red', linestyle=':', linewidth=1.5, alpha=0.8)
-    ax.annotate("Diwali 2019\n(AQI=265)", xy=(diwali_date, 265), xytext=(diwali_date + pd.Timedelta(days=8), 280),
+    ax.annotate(f"Diwali 2019\n(AQI={diwali_aqi:.0f})", xy=(diwali_date, diwali_aqi), xytext=(diwali_date - pd.Timedelta(days=28), diwali_aqi - 20),
                 arrowprops=dict(arrowstyle="->", color='red'), fontsize=9, fontweight='bold', color='red')
 
     # Inset axis for Diwali week
@@ -574,22 +582,29 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
     # -------------------------------------------------------------
     # Take a 30-day window: 2019-10-15 to 2019-11-15 (covers Diwali)
     fig, ax = plt.subplots(figsize=(11, 5), dpi=300)
-    sub_w = test_preds[(test_preds['model'] == 'LSTM (multivariate)') & (test_preds['date'] >= '2019-10-15') & (test_preds['date'] <= '2019-11-15')].sort_values('date')
-    
-    # Conformal interval for LSTM: q = 57.713
-    q_lstm = 57.713
-    # MC-dropout mean width was 31.69 (half-width ~15.8)
-    mc_hw = 15.85
-    # Parametric ARIMAX interval half-width was 46.86 (from Phase 5)
-    param_hw = 46.86
+    lstm_val = all_preds[(all_preds['split'] == 'val') & (all_preds['model'] == 'LSTM (multivariate)')]
+    lstm_test = test_preds[test_preds['model'] == 'LSTM (multivariate)'].sort_values('date')
+    sub_w = lstm_test[(lstm_test['date'] >= '2019-10-15') & (lstm_test['date'] <= '2019-11-15')].sort_values('date')
+
+    # Finite-sample Split-Conformal quantile: (ceil((n_val + 1) * 0.95))-th order statistic of |e_val|
+    val_abs_err = np.sort(np.abs(lstm_val['actual'].values - lstm_val['predicted'].values))
+    k_idx = int(np.ceil((len(val_abs_err) + 1) * 0.95)) - 1
+    q_lstm = float(val_abs_err[k_idx])
+    conf_width = 2.0 * q_lstm
+    conf_cov = float(np.mean(np.abs(lstm_test['actual'].values - lstm_test['predicted'].values) <= q_lstm) * 100.0)
+
+    mc_width = float(np.mean(lstm_test['pi_upper_95'] - lstm_test['pi_lower_95']))
+    mc_cov = float(np.mean((lstm_test['actual'] >= lstm_test['pi_lower_95']) & (lstm_test['actual'] <= lstm_test['pi_upper_95'])) * 100.0)
 
     ax.plot(sub_w['date'], sub_w['actual'], 'ko-', label='Actual AQI', linewidth=1.5, markersize=4)
     ax.plot(sub_w['date'], sub_w['predicted'], color='#2ca02c', linewidth=2, label='LSTM Point Forecast')
 
     ax.fill_between(sub_w['date'], sub_w['predicted'] - q_lstm, sub_w['predicted'] + q_lstm,
-                    color='#2ca02c', alpha=0.15, label=f'Split-Conformal 95% PI (Width=115.4, Cov=96.2%)')
-    ax.fill_between(sub_w['date'], sub_w['predicted'] - mc_hw, sub_w['predicted'] + mc_hw,
-                    color='#ff7f0e', alpha=0.25, label=f'MC-Dropout 95% PI (Width=31.7, Cov=37.9% [Epistemic Only])')
+                    color='#2ca02c', alpha=0.15,
+                    label=f'Split-Conformal 95% PI (Width={conf_width:.2f}, Cov={conf_cov:.2f}%)')
+    ax.fill_between(sub_w['date'], sub_w['pi_lower_95'], sub_w['pi_upper_95'],
+                    color='#ff7f0e', alpha=0.25,
+                    label=f'MC-Dropout 95% PI (Width={mc_width:.2f}, Cov={mc_cov:.2f}% [Epistemic Only])')
 
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
     ax.set_title("Uncertainty Quantification Comparison on 30-Day Window (15 Oct – 15 Nov 2019)\nSplit-Conformal PI (Distribution-Free) vs MC-Dropout (Epistemic-Only)", fontweight='bold')
@@ -605,20 +620,26 @@ def generate_figures(all_preds, master_df, dm_stat_matrix, p_val_matrix, alert_d
     # Fig 11: COVID Lockdown Stress Test Overlay (Mar - Jun 2020)
     # -------------------------------------------------------------
     fig, ax = plt.subplots(figsize=(11, 4.5), dpi=300)
+    st_pure = stress_preds[stress_preds['model'] == 'Pure ARIMA'].sort_values('date')
     st_pers = stress_preds[stress_preds['model'] == 'Persistence'].sort_values('date')
     st_arimax = stress_preds[stress_preds['model'] == 'ARIMAX'].sort_values('date')
     st_lstm = stress_preds[stress_preds['model'] == 'LSTM (multivariate)'].sort_values('date')
     st_hyb = stress_preds[stress_preds['model'] == 'Hybrid'].sort_values('date')
 
+    def _rmse(df_sub):
+        return float(np.sqrt(np.mean((df_sub['actual'].values - df_sub['predicted'].values) ** 2)))
+
     ax.plot(st_pers['date'], st_pers['actual'], color='black', linewidth=1.8, label='Actual AQI (Lockdown)')
-    ax.plot(st_pers['date'], st_pers['predicted'], color='#7f7f7f', linestyle=':', label='Persistence (RMSE=14.5)')
-    ax.plot(st_arimax['date'], st_arimax['predicted'], color='#1f77b4', linewidth=1.2, alpha=0.8, label='ARIMAX (RMSE=17.7)')
-    ax.plot(st_lstm['date'], st_lstm['predicted'], color='#2ca02c', linewidth=1.2, alpha=0.8, label='LSTM (RMSE=20.3)')
-    ax.plot(st_hyb['date'], st_hyb['predicted'], color='#9467bd', linewidth=1.5, linestyle='--', label='Hybrid (RMSE=15.6)')
+    ax.plot(st_pure['date'], st_pure['predicted'], color='#d62728', linewidth=1.3, alpha=0.85, label=f'Pure ARIMA (RMSE={_rmse(st_pure):.2f})')
+    ax.plot(st_pers['date'], st_pers['predicted'], color='#7f7f7f', linestyle=':', label=f'Persistence (RMSE={_rmse(st_pers):.2f})')
+    ax.plot(st_arimax['date'], st_arimax['predicted'], color='#1f77b4', linewidth=1.2, alpha=0.8, label=f'ARIMAX (RMSE={_rmse(st_arimax):.2f})')
+    ax.plot(st_lstm['date'], st_lstm['predicted'], color='#2ca02c', linewidth=1.2, alpha=0.8, label=f'LSTM (RMSE={_rmse(st_lstm):.2f})')
+    ax.plot(st_hyb['date'], st_hyb['predicted'], color='#9467bd', linewidth=1.5, linestyle='--', label=f'Hybrid (RMSE={_rmse(st_hyb):.2f})')
 
     lockdown_date = pd.Timestamp('2020-03-24')
+    lock_aqi = float(st_pers.loc[st_pers['date'] == lockdown_date, 'actual'].iloc[0])
     ax.axvline(lockdown_date, color='red', linestyle='--', linewidth=1.5, alpha=0.8)
-    ax.annotate("National Lockdown\n24 March 2020", xy=(lockdown_date, 50), xytext=(lockdown_date + pd.Timedelta(days=5), 65),
+    ax.annotate("National Lockdown\n24 March 2020", xy=(lockdown_date, lock_aqi), xytext=(lockdown_date + pd.Timedelta(days=6), 130),
                 arrowprops=dict(arrowstyle="->", color='red'), fontsize=9, fontweight='bold', color='red')
 
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))

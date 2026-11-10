@@ -340,29 +340,88 @@ def build_report():
 
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_sub.paragraph_format.space_after = Pt(36)
+    p_sub.paragraph_format.space_after = Pt(22)
     r_sub = p_sub.add_run("Technical Project Report — Chennai Corridor (CPCL Manali Refinery Zone)")
     r_sub.font.name = 'Times New Roman'
     r_sub.font.size = Pt(12.5)
     r_sub.italic = True
     r_sub.font.color.rgb = RGBColor(0x33, 0x41, 0x55)
 
+    p_grp = doc.add_paragraph()
+    p_grp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_grp.paragraph_format.space_after = Pt(8)
+    r_grp = p_grp.add_run("Submitted by: Group 2W1")
+    r_grp.font.name = 'Times New Roman'
+    r_grp.font.size = Pt(12.5)
+    r_grp.bold = True
+    r_grp.font.color.rgb = RGBColor(0x1B, 0x36, 0x5D)
+
+    members = [
+        ("Arush Saini", "1025230031"),
+        ("Jiya Wadhwa", "1025230094"),
+        ("Darsh Marwaha", "1025230032"),
+        ("Tahoor", "1025230126"),
+        ("Arshita Doomra", "1025230123"),
+    ]
+    m_tbl = doc.add_table(rows=1 + len(members), cols=2)
+    m_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+    m_tbl.autofit = False
+    for r_idx, row_vals in enumerate([("Name", "Roll No.")] + members):
+        row = m_tbl.rows[r_idx]
+        trPr = row._tr.get_or_add_trPr()
+        trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+        for c_idx, val in enumerate(row_vals):
+            cell = row.cells[c_idx]
+            cell.width = Inches(2.5 if c_idx == 0 else 1.6)
+            cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+            tcPr = cell._tc.get_or_add_tcPr()
+            if r_idx == 0:
+                tcPr.append(parse_xml(f'<w:shd {nsdecls("w")} w:fill="1B365D"/>'))
+            elif r_idx % 2 == 0:
+                tcPr.append(parse_xml(f'<w:shd {nsdecls("w")} w:fill="F1F5F9"/>'))
+            tcPr.append(parse_xml(
+                f'<w:tcBorders {nsdecls("w")}>'
+                f'<w:top w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>'
+                f'<w:bottom w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>'
+                f'<w:left w:val="none"/><w:right w:val="none"/>'
+                f'</w:tcBorders>'
+            ))
+            tcPr.append(parse_xml(
+                f'<w:tcMar {nsdecls("w")}>'
+                f'<w:top w:w="70" w:type="dxa"/><w:bottom w:w="70" w:type="dxa"/>'
+                f'<w:left w:w="120" w:type="dxa"/><w:right w:w="120" w:type="dxa"/>'
+                f'</w:tcMar>'
+            ))
+            p_c = cell.paragraphs[0]
+            p_c.alignment = WD_ALIGN_PARAGRAPH.LEFT if c_idx == 0 else WD_ALIGN_PARAGRAPH.CENTER
+            p_c.paragraph_format.space_before = Pt(0)
+            p_c.paragraph_format.space_after = Pt(0)
+            rc = p_c.add_run(val)
+            rc.font.name = 'Times New Roman'
+            rc.font.size = Pt(11)
+            if r_idx == 0:
+                rc.bold = True
+                rc.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+            else:
+                rc.font.color.rgb = RGBColor(0x1E, 0x29, 0x3B)
+
     p_meta = doc.add_paragraph()
     p_meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_meta.paragraph_format.line_spacing = 1.6
-    p_meta.paragraph_format.space_after = Pt(24)
+    p_meta.paragraph_format.line_spacing = 1.5
+    p_meta.paragraph_format.space_before = Pt(22)
+    p_meta.paragraph_format.space_after = Pt(12)
     for lbl, val in [
-        ("Submitted by:\n", "[Group Member Names & Roll Numbers]\n\n"),
-        ("Submitted to:\n", "[Instructor Name]\n\n"),
-        ("Date:\n", "[Date]")
+        ("Course: ", "UCS321 – EST Project\n"),
+        ("Institute: ", "Thapar Institute of Engineering & Technology, Patiala\n"),
+        ("Date: ", "November 2026")
     ]:
         rl = p_meta.add_run(lbl)
         rl.bold = True
         rl.font.name = 'Times New Roman'
-        rl.font.size = Pt(12)
+        rl.font.size = Pt(11.5)
         rv = p_meta.add_run(val)
         rv.font.name = 'Times New Roman'
-        rv.font.size = Pt(12)
+        rv.font.size = Pt(11.5)
 
     doc.add_page_break()
 
@@ -726,15 +785,15 @@ def build_report():
         doc,
         "Exploratory analysis on the cleaned series reveals a multi-year downward drift in ambient AQI prior to the 2020 lockdown: "
         "Training (2016–2018) averaged 112.86 ± 46.91 (median 99.0, skewness 1.64), Validation (Jan–Aug 2019) averaged 103.42 ± 36.72, "
-        "and Test (Sep 2019–Feb 2020) averaged 95.73 ± 45.03 (Table 4.1). Calendar year 2016 exhibited substantially higher mean (132.18) "
-        "and volatility (std 48.69) than 2017–2019 (annual means 102.94–105.49), reflecting an ordinary least-squares trend slope of "
-        "-8.658 AQI/year across annual means."
+        "and Test (Sep 2019–Feb 2020) averaged 95.73 ± 45.03 (Table 4.1). Calendar year 2016 exhibited substantially higher mean (128.71) "
+        "and volatility (std 45.16) than 2017–2019 (annual means 102.94–105.49), reflecting an ordinary least-squares trend slope of "
+        "-7.616 AQI/year across annual means."
     )
     add_body(
         doc,
-        "Seasonally, northeast winter (Nov–Jan) records the highest ambient levels (mean 125.72 ± 47.77) due to lower mixing heights and "
-        "festival emissions, whereas the southwest monsoon (Jun–Aug) exhibits wet scavenging lows (99.30 ± 42.61). Conversely, day-of-week "
-        "averages remain virtually flat (Mon 105.77 to Wed 114.73, cross-day std ~2.9 AQI), indicating the absence of a strong weekend effect. "
+        "Seasonally, northeast winter (Nov–Jan) records the highest ambient levels (mean 126.67 ± 49.83) due to lower mixing heights and "
+        "festival emissions, whereas the southwest monsoon (Jun–Aug) exhibits wet scavenging lows (96.30 ± 32.47). Conversely, day-of-week "
+        "averages remain relatively flat (Mon 106.49 to Sat 116.13, Sun 112.77; cross-day std ~3.34 AQI), indicating the absence of a strong weekend effect. "
         "Regarding CPCB health bands, over 93% of days fall within Satisfactory (51–100) or Moderate (101–200), while Good (<=50), Very Poor "
         "(301–400), and Severe (>400) together account for under 1.5% of observations, creating strong class imbalance for multi-class evaluation."
     )
@@ -742,12 +801,12 @@ def build_report():
     doc.add_heading("6.2 Pollutant Correlations and STL Decomposition", level=2)
     add_body(
         doc,
-        "Within the Training partition, PM2.5 exhibits the strongest contemporaneous correlation with AQI (Pearson r = 0.655, Spearman "
-        "rho = 0.704; Figure 6.1) and the strongest next-day predictive cross-correlation (r = 0.606 against AQI(t+1)), followed by CO "
-        "(0.295) and O3 (0.207). By contrast, NO2 and SO2 exhibit weak direct linear cross-correlation with next-day AQI (|r| < 0.06). "
+        "Within the Training partition, PM2.5 exhibits the strongest contemporaneous correlation with AQI (Pearson r = 0.766, Spearman "
+        "rho = 0.731; Figure 6.1) and the strongest next-day predictive cross-correlation (r = 0.729 against AQI(t+1)), followed by O3 "
+        "(0.286) and CO (0.103). By contrast, NO2 (0.016) and SO2 (0.046) exhibit weak direct linear cross-correlation with next-day AQI. "
         "Lagged cross-correlations decay steadily beyond lags 3 to 7, directly motivating a compact lookback window for sequence models. "
-        "Additive STL decomposition (Figure 6.2) quantifies annual seasonal strength at Fs = 0.5520 (m = 365), whereas weekly seasonal "
-        "strength is Fs = 0.0000 (m = 7), justifying the omission of weekly seasonal differencing."
+        "Additive STL decomposition (Figure 6.2) quantifies annual seasonal strength at Fs = 0.5672 (m = 365), whereas weekly seasonal "
+        "strength is Fs = 0.0079 (m = 7), justifying the omission of weekly seasonal differencing."
     )
     add_figure(
         doc, "outputs/figures/p4_pollutant_correlations.png", "6.1",
@@ -764,9 +823,9 @@ def build_report():
     add_body(
         doc,
         "Augmented Dickey–Fuller (ADF) and Kwiatkowski–Phillips–Schmidt–Shin (KPSS) tests were applied to Training AQI (Table 6.1). "
-        "Raw AQI yields conflicting evidence: ADF rejects a unit root (stat = -5.6173, p = 1.17e-6), whereas KPSS rejects level "
-        "stationarity (stat = 1.2982, p = 0.01) due to the multi-year trend shift. After first differencing (d=1), both tests agree on "
-        "stationarity (ADF p = 5.77e-24; KPSS stat = 0.1500, p = 0.10)."
+        "Raw AQI yields conflicting evidence: ADF rejects a unit root (stat = -5.6682, p = 9.05e-7), whereas KPSS rejects level "
+        "stationarity (stat = 1.1417, p = 0.01) due to the multi-year trend shift. After first differencing (d=1), both tests agree on "
+        "stationarity (ADF p = 1.99e-27; KPSS stat = 0.0856, p = 0.10)."
     )
 
     add_styled_table(
@@ -774,8 +833,8 @@ def build_report():
         "Stationarity Test Diagnostics on Training AQI (2016–2018, N=1,096)",
         ["Series", "ADF Statistic", "ADF p-Value", "KPSS Statistic", "KPSS p-Value", "Combined Verdict"],
         [
-            ["Raw AQI (d = 0)", "-5.6173", "1.17e-06 (Reject H0)", "1.2982", "0.010 (Reject H0)", "Trend-nonstationary (conflicting)"],
-            ["First-Differenced AQI (d = 1)", "-12.8349", "5.77e-24 (Reject H0)", "0.1500", "0.100 (Fail to reject)", "Strictly Stationary"],
+            ["Raw AQI (d = 0)", "-5.6682", "9.05e-07 (Reject H0)", "1.1417", "0.010 (Reject H0)", "Trend-nonstationary (conflicting)"],
+            ["First-Differenced AQI (d = 1)", "-14.8172", "1.99e-27 (Reject H0)", "0.0856", "0.100 (Fail to reject)", "Strictly Stationary"],
         ],
         col_widths=[1.8, 0.9, 1.25, 0.9, 1.15, 1.4],
         highlight_rows={1}
@@ -783,9 +842,9 @@ def build_report():
 
     add_body(
         doc,
-        "The ACF and PACF profiles (Figure 6.3) show a sharp PACF cutoff after lag 1 (0.697 on raw AQI), suggesting low-order AR dynamics. "
-        "Upon differencing (d=1), negative ACF spikes appear at lags 1 and 2 (-0.171, -0.149) alongside negative PACF across lags 1–9—an "
-        "over-differencing signature—coupled with weak daily lag-365 autocorrelation (r = 0.0618 near the +/-0.0592 Bartlett band). "
+        "The ACF and PACF profiles (Figure 6.3) show a sharp PACF cutoff after lag 1 (0.678 on raw AQI), suggesting low-order AR dynamics. "
+        "Upon differencing (d=1), negative ACF spikes appear at lags 1 and 2 (-0.152, -0.170) alongside negative PACF across lags 1–9—an "
+        "over-differencing signature—coupled with weak daily lag-365 autocorrelation (r = 0.0816 just above the +/-0.0592 Bartlett band). "
         "Accordingly, both d=0 (stationary with deterministic Fourier harmonics) and d=1 were systematically tested during Phase 5 grid search."
     )
     add_figure(
@@ -836,7 +895,7 @@ def build_report():
         doc,
         "Incorporating K=3 annual Fourier harmonic pairs (6 sinusoidal terms at period 365.25 days) reduced validation error smoothly relative "
         "to Pure ARIMA, and adding 1-day-lagged PM2.5(t−1) yielded a further sharp improvement (Val RMSE 30.124 -> 28.907). To verify whether "
-        "including 2016 (which exhibited higher mean AQI 132.18) helped or hurt 2019 calibration, a training-window sensitivity check compared "
+        "including 2016 (which exhibited higher mean AQI 128.71) helped or hurt 2019 calibration, a training-window sensitivity check compared "
         "the full 2016–2018 window (N=1,096 days) against a truncated 2017–2018 window (N=730 days). Retaining 2016 improved Validation RMSE "
         "from 29.920 to 28.907 (Val MAE 18.665 -> 17.333), consistent with needing three complete annual cycles to calibrate K=3 seasonal harmonics."
     )
@@ -877,12 +936,12 @@ def build_report():
     add_bullet(doc, "Stage 1 — Feature Set x Lookback Factorial Grid (80 runs): ",
                "Using a baseline 2-layer Stacked LSTM (64 units, dropout 0.2, Adam lr=1e-3, MSE), four feature sets (Univariate U, Parsimonious P, "
                "CORE C, ALL9 A) were crossed with four lookbacks L in {7, 14, 30, 60}. Compact L=7 with CORE5 (D=8 including AQI and sin/cos DOY) "
-               "achieved the lowest 5-seed Validation RMSE of 27.878 +/- 0.505 (vs Parsimonious L=7 at 28.176, ALL9 L=7 at 28.188, and Univariate L=7 "
-               "at 29.764).")
+               "achieved the lowest 5-seed Validation RMSE of 27.375 +/- 0.513 (vs CORE5 L=14 at 27.906, Parsimonious L=7 at 28.177, ALL9 L=7 at 28.195, and Univariate L=7 "
+               "at 29.765).")
     add_bullet(doc, "Stage 2 — Architecture Tournament (40 runs): ",
-               "On the top two Stage 1 configurations (C, L=7 and P, L=7), four recurrent topologies were compared across 5 seeds (Figure 8.1). "
-               "CNN-LSTM (Conv1D followed by LSTM layers) won with Validation RMSE 26.241 +/- 1.043 on CORE5, outperforming Stacked GRU (27.240), "
-               "BiLSTM (27.780), and Stacked LSTM (27.878).")
+               "On the top two Stage 1 configurations (C, L=7 and C, L=14), four recurrent topologies were compared across 5 seeds (Figure 8.1). "
+               "CNN-LSTM (Conv1D followed by LSTM layers) won with Validation RMSE 26.241 +/- 1.043 on CORE5 (L=7), outperforming Stacked GRU (27.148 at L=14, 27.207 at L=7), "
+               "Stacked LSTM (27.375), and BiLSTM (27.427).")
     add_bullet(doc, "Stage 3 — Optuna Bayesian HPO (60 trials): ",
                "Tree-structured Parzen Estimator (TPE) optimization with Median Pruning searched layer units, dropout, recurrent dropout, learning "
                "rate, batch size, L2 regularization, and loss function (MSE vs Huber). Trial #10 achieved 2-seed Val RMSE 24.850 using Huber loss, "
@@ -992,16 +1051,16 @@ def build_report():
         "HLN-Corrected Diebold–Mariano Pairwise Hypothesis Tests (Test Period, T=182)",
         ["Comparison (M1 vs M2)", "DM Stat", "p-Value", "Sig. at Unadjusted alpha=0.05?", "Sig. at Bonferroni alpha=0.005?"],
         [
-            ["ARIMAX vs Persistence", "-2.502", "0.0132", "Yes", "No"],
-            ["ARIMAX vs Pure ARIMA", "-2.190", "0.0297", "Yes", "No"],
-            ["ARIMAX vs CNN-LSTM", "-2.516", "0.0127", "Yes", "No"],
-            ["ARIMAX vs Hybrid", "-4.015", "0.0001", "Yes", "Yes (p < 0.005)"],
-            ["CNN-LSTM vs Persistence", "-1.785", "0.0758", "No", "No"],
-            ["Pure ARIMA vs Persistence", "-1.828", "0.0691", "No", "No"],
-            ["Hybrid vs Persistence", "-2.484", "0.0139", "Yes", "No"],
-            ["Hybrid vs CNN-LSTM", "-1.543", "0.1246", "No", "No"],
-            ["Hybrid vs Pure ARIMA", "-2.317", "0.0216", "Yes", "No"],
-            ["CNN-LSTM vs Pure ARIMA", "-1.493", "0.1373", "No", "No"],
+            ["ARIMAX vs Persistence", "-2.504", "0.0132", "Yes", "No"],
+            ["ARIMAX vs Pure ARIMA", "-2.192", "0.0297", "Yes", "No"],
+            ["ARIMAX vs CNN-LSTM", "-2.519", "0.0127", "Yes", "No"],
+            ["ARIMAX vs Hybrid", "-3.935", "0.0001", "Yes", "Yes (p < 0.005)"],
+            ["CNN-LSTM vs Persistence", "-1.786", "0.0758", "No", "No"],
+            ["Pure ARIMA vs Persistence", "-0.861", "0.3903", "No", "No"],
+            ["Hybrid vs Persistence", "-2.126", "0.0349", "Yes", "No"],
+            ["Hybrid vs CNN-LSTM", "-1.284", "0.2010", "No", "No"],
+            ["Hybrid vs Pure ARIMA", "-1.751", "0.0818", "No", "No"],
+            ["CNN-LSTM vs Pure ARIMA", "-1.488", "0.1385", "No", "No"],
         ],
         col_widths=[1.9, 0.8, 0.8, 1.65, 1.75],
         highlight_rows={3}
@@ -1016,9 +1075,9 @@ def build_report():
     add_body(
         doc,
         "Binary alert metrics were evaluated at CPCB action thresholds AQI > 100 (Moderate+, 52 actual Test days) and AQI > 200 (Poor+, 10 actual "
-        "Test days), as displayed in Table 9.4 and Figure 9.4, alongside category confusion matrices in Figure 9.5. At AQI > 100, ARIMAX achieved "
-        "64.52% precision, 76.92% recall, and the highest ARIMAX/Hybrid F1 score (0.7018; Hybrid recall 78.85%, F1 0.6949), clearly surpassing "
-        "Persistence (F1 0.6000). At AQI > 200, ARIMAX and Hybrid tied at 85.71% precision, 60.00% recall, and 0.7059 F1, outperforming CNN-LSTM "
+        "Test days), as displayed in Table 9.4 and Figure 9.4, alongside category confusion matrices in Figure 9.5. At AQI > 100, Hybrid achieved "
+        "86.54% recall and 0.7031 F1, while ARIMAX achieved the highest precision (64.52%) with 76.92% recall and 0.7018 F1, clearly surpassing "
+        "Persistence (F1 0.6476). At AQI > 200, ARIMAX and Hybrid tied at 85.71% precision, 60.00% recall, and 0.7059 F1, outperforming CNN-LSTM "
         "(recall 40.00%, F1 0.5333), though the 10-day sample (5.5% frequency) limits rare-event statistical power."
     )
 
@@ -1027,12 +1086,12 @@ def build_report():
         "Operational Alert Evaluation on Test Split (N=182 Days)",
         ["Threshold & Metric", "ARIMAX", "Hybrid", "CNN-LSTM", "Pure ARIMA", "Persistence"],
         [
-            ["AQI > 100 Precision (52 actual days)", "64.52%", "62.12%", "57.38%", "62.50%", "56.90%"],
-            ["AQI > 100 Recall", "76.92%", "78.85%", "67.31%", "67.31%", "63.46%"],
-            ["AQI > 100 F1 Score", "0.7018", "0.6949", "0.6195", "0.6481", "0.6000"],
-            ["AQI > 200 Precision (10 actual days)", "85.71%", "85.71%", "80.00%", "75.00%", "66.67%"],
-            ["AQI > 200 Recall", "60.00%", "60.00%", "40.00%", "60.00%", "60.00%"],
-            ["AQI > 200 F1 Score", "0.7059", "0.7059", "0.5333", "0.6667", "0.6316"],
+            ["AQI > 100 Precision (52 actual days)", "64.52%", "59.21%", "53.01%", "61.11%", "64.15%"],
+            ["AQI > 100 Recall", "76.92%", "86.54%", "84.62%", "63.46%", "65.38%"],
+            ["AQI > 100 F1 Score", "0.7018", "0.7031", "0.6519", "0.6226", "0.6476"],
+            ["AQI > 200 Precision (10 actual days)", "85.71%", "85.71%", "80.00%", "100.00%", "70.00%"],
+            ["AQI > 200 Recall", "60.00%", "60.00%", "40.00%", "50.00%", "70.00%"],
+            ["AQI > 200 F1 Score", "0.7059", "0.7059", "0.5333", "0.6667", "0.7000"],
         ],
         col_widths=[2.4, 0.9, 0.9, 0.9, 0.9, 0.9],
         highlight_rows={2, 5}
@@ -1051,9 +1110,9 @@ def build_report():
     doc.add_heading("9.4 Stratified Spike Error Analysis and Worst-Day Calendar Audit", level=2)
     add_body(
         doc,
-        "Decomposing Test errors between normal days (bottom 90%, actual AQI < 148, N=163) and spike days (top 10%, AQI >= 148, N=19) "
-        "highlights systematic negative bias on episodic peaks (Figure 9.6). While ARIMAX achieved 18.78 RMSE (+1.22 bias) on normal days, "
-        "all models degraded sharply on top-10% spikes (mean negative bias ranging from -35.7 to -55.5 AQI). Table 9.5 audits the top 5 "
+        "Decomposing Test errors between normal days (bottom 90%, actual AQI < 134.9, N=163) and spike days (top 10%, AQI >= 134.9, N=19) "
+        "highlights systematic negative bias on episodic peaks (Figure 9.6). While ARIMAX achieved 18.78 RMSE (+9.56 bias) on normal days, "
+        "all models degraded sharply on top-10% spikes (mean negative bias ranging from -27.6 to -55.5 AQI). Table 9.5 audits the top 5 "
         "worst-forecast days: exactly 2 of the 5 worst days correspond to calendar-verified festival events (Diwali on 2019-10-27 and Bhogi on "
         "2020-01-14), while the remaining 3 days carry 'No matched event'. Figure 9.7 illustrates the Diwali 2019 under-prediction across all models."
     )
@@ -1063,11 +1122,11 @@ def build_report():
         "Top 5 Worst-Forecast Test Days Audit (FINAL_NUMBERS.md)",
         ["Date", "Actual AQI", "ARIMAX Error", "CNN-LSTM Error", "Calendar Match", "Context"],
         [
-            ["2019-10-27", "306.0", "-140.78", "-144.73", "Diwali", "Verified festival pyrotechnics spike"],
-            ["2020-01-14", "217.0", "-92.20", "-82.60", "Bhogi", "Verified harvest bonfire smoke event"],
-            ["2019-10-28", "239.0", "-81.25", "-84.99", "No matched event", "Post-Diwali lingering stagnation"],
-            ["2019-11-20", "236.0", "-76.88", "-83.17", "No matched event", "Unmodeled meteorological stagnation"],
-            ["2019-11-22", "240.0", "-76.08", "-81.56", "No matched event", "Regional atmospheric inversion"],
+            ["2019-10-27", "306.0", "-140.81", "-144.74", "Diwali 2019", "Verified festival pyrotechnics spike"],
+            ["2020-01-14", "230.0", "-92.22", "-85.63", "Bhogi 2020", "Verified harvest bonfire smoke event"],
+            ["2019-11-04", "222.0", "-90.43", "-83.72", "No matched event", "Sudden post-monsoon jump from 91 to 222 AQI"],
+            ["2019-11-12", "77.0", "+72.90", "+66.91", "No matched event", "Over-prediction after rapid ambient drop"],
+            ["2019-11-07", "273.0", "-67.96", "-75.09", "No matched event", "Unmodeled severe pollution buildup"],
         ],
         col_widths=[0.95, 0.8, 0.95, 1.05, 1.25, 1.9],
         highlight_rows={0, 1}
@@ -1130,8 +1189,8 @@ def build_report():
         [
             ["ARIMAX Split-Conformal", "Distribution-free", "63.87", "127.74", "96.70%", "98.36%"],
             ["LSTM Split-Conformal", "Distribution-free", "57.71", "115.43", "96.15%", "98.36%"],
-            ["ARIMAX Parametric", "Gaussian (+/-1.96 sigma)", "N/A", "93.73", "96.70%", "93.44%"],
-            ["LSTM MC-Dropout", "Epistemic parameter", "N/A", "31.69", "37.91%", "27.87%"],
+            ["ARIMAX Parametric", "Gaussian (+/-1.96 sigma)", "N/A", "114.39", "96.15%", "97.54%"],
+            ["LSTM MC-Dropout", "Epistemic parameter", "N/A", "31.69", "37.91%", "N/A"],
         ],
         col_widths=[1.6, 1.4, 0.9, 1.05, 0.95, 1.0],
         highlight_rows={0, 1}
@@ -1156,11 +1215,11 @@ def build_report():
         "Validation (N=243) and COVID Lockdown Stress Window (N=122) Metrics with Stress Mean Bias",
         ["Model Name", "Val RMSE", "Val MAE", "Stress RMSE", "Stress MAE", "Stress R²", "Stress Acc", "Stress Bias"],
         [
-            ["Pure ARIMA(2,1,1)", "34.02", "20.48", "13.51", "9.06", "0.5567", "86.89%", "-1.15"],
+            ["Pure ARIMA(2,1,1)", "30.49", "20.45", "13.51", "9.06", "0.5567", "86.89%", "-1.15"],
             ["Naive Persistence", "34.27", "20.85", "14.45", "9.41", "0.4928", "87.70%", "-0.31"],
             ["7-Day MA", "34.50", "24.27", "14.65", "10.22", "0.4793", "86.89%", "-0.82"],
             ["Hybrid ARIMAX+LSTM", "—", "—", "15.62", "9.46", "0.4080", "86.89%", "-3.19"],
-            ["Univariate LSTM", "30.65", "20.24", "15.98", "12.77", "0.3801", "86.07%", "+7.84"],
+            ["Univariate LSTM", "29.61", "20.03", "15.98", "12.77", "0.3801", "86.07%", "+7.84"],
             ["ARIMAX(2,1,1)+F3+PM2.5", "28.91", "17.33", "17.74", "12.37", "0.2361", "80.33%", "-8.32"],
             ["CNN-LSTM (Multivariate)", "25.63", "17.03", "20.28", "15.40", "0.0019", "81.97%", "+10.55"],
             ["Seasonal Naive (365d)", "46.33", "34.76", "37.93", "28.82", "-2.4913", "62.30%", "+22.70"],

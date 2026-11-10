@@ -1,5 +1,6 @@
 # Project Master Guide & Viva Preparation
-**UCS321 – EST Project | IndianOil (CPCL Manali, Chennai) AQI Forecasting**
+**UCS321 – EST Project | Group 2W1 | Thapar Institute of Engineering & Technology, Patiala | November 2026**
+**Topic:** IndianOil (CPCL Manali, Chennai) AQI Forecasting — Arush Saini (`1025230031`), Jiya Wadhwa (`1025230094`), Darsh Marwaha (`1025230032`), Tahoor (`1025230126`), Arshita Doomra (`1025230123`)
 
 ---
 
@@ -31,7 +32,7 @@ All numbers match `docs/FINAL_NUMBERS.md` (single source of truth).
 | **Stress Test (Lockdown, $N=122$)** | **Pure ARIMA RMSE 13.51** (bias -1.15) | Persist 14.45 (-0.31) \| Hybrid 15.62 (-3.19) \| Uni LSTM 15.98 (+7.84) \| ARIMAX 17.74 (-8.32) \| CNN-LSTM 20.28 (+10.55) |
 | **Operational Alerts (ARIMAX)** | AQI >100: F1 0.7018 \| >200: F1 0.7059 | >100 (52d): Prec 64.52%, Rec 76.92% \| >200 (10d): Prec 85.71%, Rec 60.00% |
 | **Prediction Intervals (95%)** | Split-conformal: **96.70%** (ARIMAX) | $q=63.87$ (width 127.74) \| LSTM conformal 96.15% ($q=57.71$) \| MC-Dropout: **37.91%** (width 31.69) |
-| **Worst-Forecast Days (Top 5)** | **2 of 5** matched festivals | Diwali `2019-10-27` (actual 306, err -140.78) & Bhogi `2020-01-14` (217, err -92.20); 3 unmatched |
+| **Worst-Forecast Days (Top 5)** | **2 of 5** matched festivals | Diwali `2019-10-27` (actual 306, err -140.81) & Bhogi `2020-01-14` (actual 230, err -92.22); 3 unmatched |
 
 ---
 
@@ -116,16 +117,16 @@ All numbers match `docs/FINAL_NUMBERS.md` (single source of truth).
 
 ### Group 3: Exploratory Data Analysis (Q15–Q20)
 15. **What is the strongest predictor of next-day AQI in Chennai?**  
-    Fine particulate matter PM2.5 has the highest Spearman correlation ($\rho = 0.704$) and strongest next-day lag-1 cross-correlation ($r = 0.606$) with AQI, followed by CO ($0.295$) and O3 ($0.207$).
+    Fine particulate matter PM2.5 has the highest Spearman correlation ($\rho = 0.731$; Pearson $r = 0.766$) and strongest next-day lag-1 cross-correlation ($r = 0.729$) with AQI, followed by O3 ($0.286$) and CO ($0.103$).
 16. **Why did raw ADF and KPSS disagree on stationarity?**  
-    Raw AQI showed a gentle downward drift across 2016–2019 (132.18 in 2016 down to ~103–105 later). ADF rejected a unit root ($p=1.17\times 10^{-6}$), while KPSS rejected level stationarity ($p=0.01$) because of that mean shift.
+    Raw AQI showed a gentle downward drift across 2016–2019 (128.71 in 2016 down to ~103–105 later). ADF rejected a unit root ($p=9.05\times 10^{-7}$), while KPSS rejected level stationarity ($p=0.01$) because of that mean shift.
 17. **What does STL decomposition tell us about weekly vs annual seasonality?**  
-    STL measured annual seasonal strength at $F_s = 0.5520$ (winter highs vs monsoon lows) and weekly seasonal strength at $F_s = 0.0000$. Day-of-week mean AQI varies by only ~3 points, so weekly seasonal terms were unnecessary.
+    STL measured annual seasonal strength at $F_s = 0.5672$ (winter highs vs monsoon lows) and weekly seasonal strength at $F_s = 0.0079$. Day-of-week mean AQI varies little across the week (std 3.34), so weekly seasonal terms were unnecessary.
 18. **Why is CPCB category balance a problem for simple accuracy?**  
     Over 93% of days fall in just two bands (Satisfactory and Moderate), while Good, Very Poor, and Severe together represent under 1.5%. High raw accuracy can hide poor spike detection, which is why we also report Macro-F1 and QWK.
 19. **What happened to pollutants during the 2020 lockdown?**  
     Combustion pollutants fell sharply (NO2 $-52.2\%$, PM2.5 $-46.6\%$), pulling AQI down to mean 78.81. Meanwhile surface Ozone (O3) rose $+42.1\%$, consistent with reduced NO titration in urban VOC-limited chemistry.
-20. **Why did you keep 2016 in training if its mean AQI (132.18) was higher than 2017–2019?**  
+20. **Why did you keep 2016 in training if its mean AQI (128.71) was higher than 2017–2019?**  
     Our sensitivity check showed training on full 2016–2018 ($N=1,096$, Val RMSE 28.907) beat truncating to 2017–2018 ($N=730$, Val RMSE 29.920). Three complete annual cycles gave better Fourier harmonic calibration.
 
 ### Group 4: ARIMA & ARIMAX (Q21–Q27)
@@ -148,7 +149,7 @@ All numbers match `docs/FINAL_NUMBERS.md` (single source of truth).
 28. **Why did a short 7-day lookback beat 14, 30, and 60 days in Stage 1?**  
     Cross-correlations between pollutants and AQI decay beyond 3–7 days. Longer windows (30–60 days) add parameters and noise on a ~1,000-day dataset without adding predictive signal.
 29. **Why did CNN-LSTM win Stage 2 over Stacked LSTM and GRU?**  
-    A 1-D convolution extracts short multi-day local patterns across pollutants (e.g., stagnation build-up over 3 days) before feeding the recurrent layer, achieving Val RMSE 26.241 vs 27.240 (GRU) and 27.878 (Stacked LSTM).
+    A 1-D convolution extracts short multi-day local patterns across pollutants (e.g., stagnation build-up over 3 days) before feeding the recurrent layer, achieving Val RMSE 26.241 vs 27.148 (GRU, L=14), 27.207 (GRU, L=7), and 27.375 (Stacked LSTM, L=7).
 30. **Why did Optuna choose Huber loss and batch size 16?**  
     Huber loss dampens extreme gradients from rare Diwali-level spikes so weights fit typical dynamics cleanly, while batch size 16 introduces helpful gradient noise for regularization on a ~1,000-sample dataset. Learning rate dominated Optuna importance (67.9%).
 31. **Why did the 7-day LSTM need only 2 epochs?**  
@@ -215,3 +216,4 @@ All numbers match `docs/FINAL_NUMBERS.md` (single source of truth).
 - **Fence-Line & CEMS Integration**: Pair CPCB ambient monitors with refinery perimeter micro-sensors and Continuous Emission Monitoring System (CEMS) stack logs to isolate refinery plumes from urban traffic.
 - **Incorporate Meteorology**: Couple forecast models with Numerical Weather Prediction (NWP) wind fields, humidity, and boundary-layer height so non-festival stagnation episodes are predictable.
 - **Festival Calendar Indicators & Online Adaptation**: Include explicit Diwali/Bhogi event indicators and implement periodic rolling window recalibration (or online state updating) so models adapt smoothly across regime breaks like lockdowns without over-anchoring to past baselines.
+

@@ -26,7 +26,7 @@
    - Strict temporal scaling: Scikit-learn `MinMaxScaler(0,1)` fit on Train only, transforming Val, Test, and Stress.
 4. **Phase 4: Exploratory Data Analysis & Feature Verification**
    - Temporal decomposition: STL and classical additive decomposition revealing strong annual cyclicity.
-   - Correlation analysis: $\text{PM}_{2.5}$ identified as primary driver of AQI ($r = 0.88$).
+   - Correlation analysis: $\text{PM}_{2.5}$ identified as primary driver of AQI ($r = 0.766$, lag-1 $r = 0.729$).
    - Calendar spike table: Diwali and Bhogi verified as primary spike drivers.
    - Station vs City consistency: Validated CPCL Manali monitoring station (TN001) alignment with city index.
 5. **Phase 5: Classical Time Series Modeling (ARIMA / ARIMAX)**
@@ -146,7 +146,7 @@ flowchart TD
 
     subgraph Operational_Advisory["6. Potential Operational Decision Support"]
         DayAhead["Day-Ahead Baseline Forecast:<br/>ARIMAX(2,1,1)+F3+PM2.5<br/>City-level ambient early warning"]
-        UncertaintyBand["Empirical Uncertainty Range:<br/>Split-Conformal Interval (q = 63.9)<br/>Ambient background scenario bounds"]
+        UncertaintyBand["Empirical Uncertainty Range:<br/>Split-Conformal Interval (q = 63.87)<br/>Ambient background scenario bounds"]
         MediumRange["Medium-Range Trajectory (h=5-7):<br/>Direct Multi-Step LSTM<br/>Multi-day seasonal trend context"]
         
         Grid2x2 --> DayAhead

@@ -263,9 +263,9 @@ To provide risk-bounded confidence intervals, we evaluated:
     'Method': ['ARIMAX Parametric PI', 'LSTM MC-Dropout (Epistemic)', 'ARIMAX Split-Conformal PI', 'LSTM Split-Conformal PI'],
     'Interval Type': ['Parametric (Gaussian)', 'Epistemic Uncertainty Only', 'Distribution-Free Conformal', 'Distribution-Free Conformal'],
     'Val Conformal q': ['N/A', 'N/A', '63.87', '57.71'],
-    'Mean Width (AQI)': [93.73, 31.69, 127.74, 115.43],
-    'Test Coverage (Nominal 95%)': ['96.70%', '37.91%', '96.70%', '96.15%'],
-    'Stress Coverage': ['93.44%', '27.87%', '98.36%', '98.36%']
+    'Mean Width (AQI)': [114.39, 31.69, 127.74, 115.43],
+    'Test Coverage (Nominal 95%)': ['96.15%', '37.91%', '96.70%', '96.15%'],
+    'Stress Coverage': ['97.54%', 'N/A', '98.36%', '98.36%']
 })
 
 print("=== PREDICTION INTERVAL BENCHMARK ===")
@@ -320,8 +320,8 @@ plt.show()
    - In Classical modeling, adding PM2.5 reduced RMSE from 30.58 to 25.97 (-15.1%).
    - In Deep Learning, adding multivariate features reduced RMSE from 31.73 to 27.63 (-12.9%).
 4. **All Models Exhibit Systematic Under-Prediction on Extreme Spikes**:
-   - On the top 10% highest AQI days (AQI $\\ge 148$), every model showed negative bias ($\\bar{e} \\in [-35.7, -55.5]$ AQI).
-   - In an audit of the top 5 worst-forecast days for each model, **2 of the 5 worst days correspond to calendar-verified festival events** (Diwali on 2019-10-27 and Bhogi on 2020-01-14). The remaining 3 days carry "No matched event".
+   - On the top 10% highest AQI days (AQI $\\ge 134.9$, $N=19$), every model showed negative bias ($\\bar{e} \\in [-35.7, -55.5]$ AQI).
+   - In an audit of the top 5 worst-forecast days for each model, **2 of the 5 worst days correspond to calendar-verified festival events** (Diwali on 2019-10-27, actual AQI 306.0, and Bhogi on 2020-01-14, actual AQI 230.0). The remaining 3 days carry "No matched event".
 5. **COVID Lockdown Stress Window Metrics & Mean Forecast Bias**:
    - Pure ARIMA achieved the lowest stress RMSE (13.51), followed by persistence (14.45); models using exogenous or seasonal terms (ARIMAX 17.74, multivariate CNN-LSTM 20.28) performed worst, with the LSTMs over-predicting (mean bias +7.84 / +10.55) and ARIMAX under-predicting (−8.32).
    - Across the 122-day national lockdown (Mean AQI = 78.81 vs pre-lockdown mean 109.30), model performance and mean forecast bias ($\\bar{e} = \\frac{1}{N}\\sum (\\hat{y}_t - y_t)$) were: Pure ARIMA(2,1,1) achieved RMSE 13.51, MAE 9.06, and Bias -1.15 AQI; Naive Persistence achieved RMSE 14.45, MAE 9.41, and Bias -0.31 AQI; 7-Day MA achieved RMSE 14.65, MAE 10.22, and Bias -0.82 AQI; Hybrid ARIMAX+LSTM achieved RMSE 15.62, MAE 9.46, and Bias -3.19 AQI; Univariate LSTM achieved RMSE 15.98, MAE 12.77, and Bias +7.84 AQI; ARIMAX(2,1,1)+F3+PM2.5 achieved RMSE 17.74, MAE 12.37, and Bias -8.32 AQI; and Standalone Multivariate CNN-LSTM achieved RMSE 20.28, MAE 15.40, and Bias +10.55 AQI.

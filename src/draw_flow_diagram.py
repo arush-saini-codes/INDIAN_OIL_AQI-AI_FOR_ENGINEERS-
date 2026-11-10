@@ -133,7 +133,7 @@ def build_detailed_diagram():
         ("2.1 Load & Filter", "Extract City == 'Chennai'\nDrop 2015 outage period"),
         ("2.2 Calendar Reindex", "Continuous daily index\n2016-01-01 to 2020-06-30"),
         ("2.3 Validity Checks", "Physical lower check:\nValues < 0 set to NaN"),
-        ("2.4 Sensor Anomaly Removal", "Flag TN004 CO fault\n(19–22 Sep 2016 -> NaN)"),
+        ("2.4 Sensor Anomaly Removal", "Flag TN004 CO faults\n(15 days Aug–Sep 2016 -> NaN)"),
         ("2.5 Gap-Based Imputation", "<=3d: Linear interp.\n4–30d: DOY train median"),
         ("2.6 Outlier Handling", "Upper winsorization (99.5th)\nAQI spikes preserved intact"),
         ("2.7 Calendar Features", "Cyclical sin/cos DOY\n& Fourier harmonics (K=3)"),
@@ -178,14 +178,14 @@ def build_detailed_diagram():
                    facecolor=C_EDA[0], edgecolor=C_EDA[1], label_bg=C_EDA[1])
 
     eda_steps = [
-        ("3.1 Descriptive Stats", "Right-skewed AQI (skew 2.02)\nTrain mean 112.9 -> Test 95.7"),
+        ("3.1 Descriptive Stats", "Right-skewed AQI (skew 1.64)\nTrain mean 112.9 -> Test 95.7"),
         ("3.2 Trend Analysis", "Multi-year downward drift\n& 2020 lockdown drop"),
-        ("3.3 Seasonality", "Strong annual cycle (Fs=0.57)\nNegligible weekly cycle"),
+        ("3.3 Seasonality", "Strong annual cycle (Fs=0.567)\nNegligible weekly (Fs=0.008)"),
         ("3.4 Category Dist.", ">93% Satisfactory / Moderate\nRare Severe episodes (<1.5%)"),
-        ("3.5 Correlations", "PM2.5 primary driver (r=0.88)\nNext-day lag-1 r = 0.606"),
+        ("3.5 Correlations", "PM2.5 primary driver (r=0.766)\nNext-day lag-1 r = 0.729"),
         ("3.6 STL Decomposition", "Additive trend, annual seasonal\n& residual spike isolation"),
         ("3.7 ADF / KPSS Tests", "Non-stationary raw AQI\nd=1 achieves strict stationarity"),
-        ("3.8 ACF / PACF", "PACF lag-1 cutoff (0.697)\nGuides ARIMA(p,1,q) orders"),
+        ("3.8 ACF / PACF", "PACF lag-1 cutoff (0.678)\nGuides ARIMA(p,1,q) orders"),
     ]
     xs_4 = [6.5, 29.0, 51.5, 74.0]
     ys_2 = [91.5, 83.8]
@@ -240,7 +240,7 @@ def build_detailed_diagram():
     draw_container(ax, 52, 26.5, 44, 51.0, "4B. DEEP LEARNING BRANCH (LSTM / HYBRID)",
                    facecolor=C_LST[0], edgecolor=C_LST[1], label_bg=C_LST[1])
     lstm_steps = [
-        ("Sequence Windows", "Chronological sliding lookbacks L in {7, 14, 21, 30}"),
+        ("Sequence Windows", "Chronological sliding lookbacks L in {7, 14, 30, 60}"),
         ("Stage 1: Features x Lookback", "80 runs: CORE, ALL9, Univariate, Lags (5 seeds)"),
         ("Stage 2: Architecture Tournament", "40 runs: Stacked, BiLSTM, GRU, CNN-LSTM (Winner)"),
         ("Stage 3: Optuna Bayesian HPO", "60 trials tuning units, dropout, LR, Huber/MSE"),
@@ -340,7 +340,7 @@ def build_compact_diagram():
 
     # 3. EDA & Diagnostics
     draw_box(ax, 14, 54.5, 72, 10.1, "3. EDA & Time-Series Diagnostics",
-             "• PM2.5 primary driver (r = 0.88, lag-1 r = 0.606); strong annual seasonality\n"
+             "• PM2.5 primary driver (r = 0.766, lag-1 r = 0.729); annual cycle (Fs = 0.567)\n"
              "• STL decomposition & CPCB category profiling (>93% Satisfactory/Moderate)\n"
              "• ADF/KPSS stationarity (d=1) & ACF/PACF lag identification",
              facecolor='#F5F3FF', edgecolor='#7C3AED', lw=1.8, title_size=10.0, sub_size=7.8)

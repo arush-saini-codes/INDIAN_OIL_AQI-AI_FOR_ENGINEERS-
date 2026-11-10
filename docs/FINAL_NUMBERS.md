@@ -16,7 +16,9 @@
 | **Stress (Lockdown)** | 2020-03-01 | 2020-06-30 | 122 | 78.81 | 20.38 | Out-of-distribution structural break evaluation | `data/processed/stress.csv` |
 | **Full Series** | 2016-01-01 | 2020-06-30 | 1643 | 107.04 | 44.92 | Entire continuous audited modelling series | `data/processed/chennai_clean_full.csv` |
 
-*Exclusion Note:* 2015 data is excluded due to an 82-day monitoring outage (Sep–Nov 2015). Sensor anomaly from 2016-09-19 to 2016-09-22 (TN004 CO failure) was removed and re-imputed.
+*Exclusion Note:* 2015 data is excluded due to an 82-day monitoring outage (Sep–Nov 2015). Sensor anomalies across 15 days in Aug–Sep 2016 (including 2016-09-19 to 2016-09-22 TN004 CO failure) were removed and re-imputed.
+
+*EDA Diagnostics Summary (Train $N=1,096$):* Annual OLS slope $-7.616$ AQI/year; Winter $126.67 \pm 49.83$, SW Monsoon $96.30 \pm 32.47$; $\text{PM}_{2.5}$ contemporaneous $r = 0.766$ ($\rho = 0.731$), next-day lag-1 $r = 0.729$; STL annual strength $F_s = 0.5672$, weekly $F_s = 0.0079$; raw PACF lag-1 $= 0.678$.
 
 ---
 
@@ -43,11 +45,11 @@ Source: `outputs/results/p7_master_results.csv`, `outputs/results/p5_predictions
 
 | Model Name | Val RMSE | Val MAE | Val $R^2$ | Val Acc (%) | Stress RMSE | Stress MAE | Stress $R^2$ | Stress Acc (%) | Stress Mean Bias ($\bar{e}$) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Pure ARIMA(2,1,1)** | 34.02 | 20.48 | 0.1383 | 72.84 | **13.51** | **9.06** | **0.5567** | 86.89 | **-1.15** |
+| **Pure ARIMA(2,1,1)** | 30.49 | 20.45 | 0.3076 | 72.43 | **13.51** | **9.06** | **0.5567** | 86.89 | **-1.15** |
 | **Naive Persistence** | 34.27 | 20.85 | 0.1256 | 71.60 | 14.45 | 9.41 | 0.4928 | **87.70** | **-0.31** |
 | **7-Day MA** | 34.50 | 24.27 | 0.1138 | 58.85 | 14.65 | 10.22 | 0.4793 | 86.89 | **-0.82** |
 | **Hybrid ARIMAX+LSTM** | — | — | — | — | 15.62 | 9.46 | 0.4080 | 86.89 | **-3.19** |
-| **Univariate LSTM** | 30.65 | 20.24 | 0.3001 | 69.96 | 15.98 | 12.77 | 0.3801 | 86.07 | **+7.84** |
+| **Univariate LSTM** | 29.61 | 20.03 | 0.3473 | 72.02 | 15.98 | 12.77 | 0.3801 | 86.07 | **+7.84** |
 | **ARIMAX(2,1,1)+F3+PM2.5** | 28.91 | 17.33 | 0.3778 | 74.90 | 17.74 | 12.37 | 0.2361 | 80.33 | **-8.32** |
 | **CNN-LSTM (Multivariate)** | **25.63** | **17.03** | **0.5107** | **75.72** | 20.28 | 15.40 | 0.0019 | 81.97 | **+10.55** |
 | **Seasonal Naive (365d)** | 46.33 | 34.76 | -0.5985 | 49.79 | 37.93 | 28.82 | -2.4913 | 62.30 | **+22.70** |
@@ -84,16 +86,16 @@ Sources: `outputs/results/p7_diebold_mariano_stat.csv`, `outputs/results/p7_dieb
 
 | Comparison ($M_1$ vs $M_2$) | HLN Test Stat ($DM$) | Two-Sided $p$-Value | Significant at Unadjusted $\alpha=0.05$? | Significant at Bonferroni $\alpha_{\text{adj}}=0.005$? |
 | :--- | :---: | :---: | :---: | :---: |
-| **ARIMAX vs Persistence** | -2.502 | **0.0132** | Yes (ARIMAX beats Persistence) | No |
-| **ARIMAX vs Pure ARIMA** | -2.190 | **0.0297** | Yes (ARIMAX beats Pure ARIMA) | No |
-| **ARIMAX vs Final LSTM** | -2.516 | **0.0127** | Yes (ARIMAX beats LSTM) | No |
-| **ARIMAX vs Hybrid** | -4.015 | **0.0001** | Yes (ARIMAX beats Hybrid) | **Yes** ($p < 0.005$) |
-| **Final LSTM vs Persistence** | -1.785 | **0.0758** | No | No |
-| **Pure ARIMA vs Persistence** | -1.828 | **0.0691** | No | No |
-| **Hybrid vs Persistence** | -2.484 | **0.0139** | Yes (Hybrid beats Persistence) | No |
-| **Hybrid vs Final LSTM** | -1.543 | **0.1246** | No | No |
-| **Hybrid vs Pure ARIMA** | -2.317 | **0.0216** | Yes (Hybrid beats Pure ARIMA) | No |
-| **Final LSTM vs Pure ARIMA** | -1.493 | **0.1373** | No | No |
+| **ARIMAX vs Persistence** | -2.504 | **0.0132** | Yes (ARIMAX beats Persistence) | No |
+| **ARIMAX vs Pure ARIMA** | -2.192 | **0.0297** | Yes (ARIMAX beats Pure ARIMA) | No |
+| **ARIMAX vs Final LSTM** | -2.519 | **0.0127** | Yes (ARIMAX beats LSTM) | No |
+| **ARIMAX vs Hybrid** | -3.935 | **0.0001** | Yes (ARIMAX beats Hybrid) | **Yes** ($p < 0.005$) |
+| **Final LSTM vs Persistence** | -1.786 | **0.0758** | No | No |
+| **Pure ARIMA vs Persistence** | -0.861 | **0.3903** | No | No |
+| **Hybrid vs Persistence** | -2.126 | **0.0349** | Yes (Hybrid beats Persistence) | No |
+| **Hybrid vs Final LSTM** | -1.284 | **0.2010** | No | No |
+| **Hybrid vs Pure ARIMA** | -1.751 | **0.0818** | No | No |
+| **Final LSTM vs Pure ARIMA** | -1.488 | **0.1385** | No | No |
 
 ---
 
@@ -104,13 +106,13 @@ Source: `outputs/results/p7_alert_evaluation.csv`
 | Metric / Threshold | ARIMAX(2,1,1)+F3+PM2.5 | Hybrid ARIMAX+LSTM | Final CNN-LSTM | Pure ARIMA(2,1,1) | Naive Persistence |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Actual Alert Days (AQI > 100)** | 52 | 52 | 52 | 52 | 52 |
-| Precision (AQI > 100) | **64.52%** | 62.12% | 57.38% | 62.50% | 56.90% |
-| Recall (AQI > 100) | 76.92% | **78.85%** | 67.31% | 67.31% | 63.46% |
-| F1 Score (AQI > 100) | **0.7018** | 0.6949 | 0.6195 | 0.6481 | 0.6000 |
+| Precision (AQI > 100) | **64.52%** | 59.21% | 53.01% | 61.11% | 64.15% |
+| Recall (AQI > 100) | 76.92% | **86.54%** | 84.62% | 63.46% | 65.38% |
+| F1 Score (AQI > 100) | 0.7018 | **0.7031** | 0.6519 | 0.6226 | 0.6476 |
 | **Actual Alert Days (AQI > 200)** | 10 | 10 | 10 | 10 | 10 |
-| Precision (AQI > 200) | **85.71%** | **85.71%** | 80.00% | 75.00% | 66.67% |
-| Recall (AQI > 200) | **60.00%** | **60.00%** | 40.00% | **60.00%** | **60.00%** |
-| F1 Score (AQI > 200) | **0.7059** | **0.7059** | 0.5333 | 0.6667 | 0.6316 |
+| Precision (AQI > 200) | 85.71% | 85.71% | 80.00% | **100.00%** | 70.00% |
+| Recall (AQI > 200) | 60.00% | 60.00% | 40.00% | 50.00% | **70.00%** |
+| F1 Score (AQI > 200) | **0.7059** | **0.7059** | 0.5333 | 0.6667 | 0.7000 |
 
 *Sample Size Note:* AQI > 200 days occurred on 10 days in the Test split (5.5% frequency), creating severe sample size limits for assessing high-threshold alert reliability.
 
@@ -118,29 +120,31 @@ Source: `outputs/results/p7_alert_evaluation.csv`
 
 ## 7. Uncertainty Quantification: Prediction Intervals
 
-Sources: `outputs/results/p7_conformal_quantiles.json`, `outputs/results/p7_master_results.csv`.
+Sources: `outputs/results/p5_predictions.csv`, `outputs/results/p6_predictions.csv`, `outputs/models/arima_final.pkl`, `outputs/results/p7_master_results.csv`.
 
 | Interval Construction | Type | Calibration Quantile ($q$) | Mean Width (AQI) | Test Empirical Coverage | Stress Empirical Coverage |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **ARIMAX Split-Conformal** | Distribution-free | **63.87** | 127.74 | **96.70%** | **98.36%** |
 | **LSTM Split-Conformal** | Distribution-free | **57.71** | 115.43 | **96.15%** | **98.36%** |
-| **ARIMAX Parametric** | Gaussian ($\pm 1.96 \sigma_t$) | N/A | 93.73 | **96.70%** | 93.44% |
-| **LSTM MC-Dropout** | Epistemic parameter | N/A | 31.69 | **37.91%** | 27.87% |
+| **ARIMAX Parametric** | Gaussian ($\pm 1.96 \sigma_t$) | N/A | 114.39 | **96.15%** | 97.54% |
+| **LSTM MC-Dropout** | Epistemic parameter | N/A | 31.69 | **37.91%** | N/A (not saved for Stress) |
 
 *Caveat on Coverage:* Split-conformal theoretical finite-sample marginal coverage guarantees require exchangeability, which time-series data with drift and seasonal shifts do not strictly satisfy.
 
 ---
 
-## 8. Worst-Forecast Days Audit & Festival Identification
+## 8. Worst-Forecast Days Audit & Spike Analysis
 
-Source: `outputs/results/p7_worst_days.csv`
+Source: `outputs/results/p7_worst_days.csv`, `outputs/results/p7_spike_vs_normal.csv`
+
+*Spike vs Normal Split (Test $N=182$):* Top 10% highest Test days defined by $\text{AQI} \ge 134.90$ (`q90 = 134.90`, $N=19$ Spike days; $N=163$ Normal days). All models show negative spike bias ($-27.58$ to $-55.54$ AQI; ARIMAX $-36.83$, LSTM $-39.09$, Hybrid $-35.74$).
 
 | Date | Actual AQI | ARIMAX Error | LSTM Error | Calendar Event Match | Description / Root Cause |
 | :---: | :---: | :---: | :---: | :--- | :--- |
-| **2019-10-27** | 306.0 | **-140.78** | **-144.73** | **Diwali** | Verified festival firecracker smoke; single largest spike |
-| **2020-01-14** | 217.0 | **-92.20** | **-82.60** | **Bhogi** | Verified harvest bonfire burning festival; extreme morning smoke |
-| **2019-10-28** | 239.0 | -81.25 | -84.99 | No matched event | Post-Diwali lingering stagnation |
-| **2019-11-20** | 236.0 | -76.88 | -83.17 | No matched event | Unmodeled meteorological stagnation |
-| **2019-11-22** | 240.0 | -76.08 | -81.56 | No matched event | Regional atmospheric inversion |
+| **2019-10-27** | 306.0 | **-140.81** | **-144.74** | **Diwali 2019** | Verified festival firecracker smoke; single largest spike |
+| **2020-01-14** | 230.0 | **-92.22** | **-85.63** | **Bhogi 2020** | Verified harvest bonfire burning festival; morning smoke |
+| **2019-11-04** | 222.0 | -90.43 | -83.72 | No matched event | Sudden post-monsoon jump from 91 to 222 AQI |
+| **2019-11-12** | 77.0 | +72.90 | +66.91 | No matched event | Over-prediction following rapid ambient drop after multi-day peak |
+| **2019-11-07** | 273.0 | -67.96 | -75.09 | No matched event | Unmodeled severe pollution buildup |
 
-*Audit Summary:* Exactly **2 of the 5 worst days** correspond to calendar-verified festival events. The remaining 3 days carry "No matched event".
+*Audit Summary:* Exactly **2 of the 5 worst days** (Rank 1 & Rank 2 for both ARIMAX and LSTM) correspond to calendar-verified festival events (Diwali 2019-10-27, Bhogi 2020-01-14). The remaining 3 days carry "No matched event".

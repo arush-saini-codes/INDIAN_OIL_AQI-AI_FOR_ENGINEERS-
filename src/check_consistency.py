@@ -176,7 +176,14 @@ def main():
         (r'proven statistical significance', 'unqualified phrase: proven statistical significance'),
         (r'mathematically guaranteed', 'unqualified phrase: mathematically guaranteed'),
         (r'anchoring to pre-lockdown levels', 'prohibited phrase: anchoring to pre-lockdown levels'),
-        (r'adapted faster through its ARIMAX component', 'prohibited phrase: adapted faster through its ARIMAX component')
+        (r'adapted faster through its ARIMAX component', 'prohibited phrase: adapted faster through its ARIMAX component'),
+        (r'\b93\.73\b', 'stale parametric PI width 93.73 (should be 114.39)'),
+        (r'\b93\.44%', 'stale parametric PI stress cov 93.44% (should be 97.54%)'),
+        (r'\b27\.87%', 'stale MC-dropout stress cov 27.87% (should be N/A)'),
+        (r'\b148\b(?=\s*AQI|\))|AQI\s*(?:>=|<|\\ge)\s*148\b', 'stale spike threshold 148 (should be 134.9)'),
+        (r'\b217\.0\b', 'stale Bhogi 2020-01-14 AQI 217.0 (should be 230.0)'),
+        (r'\b0\.5520\b', 'stale STL Fs 0.5520 (should be 0.5672)'),
+        (r'\[Group|\[Instructor|<INSTRUCTOR', 'unfilled template placeholder')
     ]
 
     for fpath in doc_files:
@@ -242,6 +249,11 @@ def main():
         (r'\b91\.24\b', 'outdated val mean 91.24 (should be 103.42)'),
         (r'\b102\.48\b', 'outdated test mean 102.48 (should be 95.73)'),
         (r'\b21\.61\b', 'outdated univariate LSTM stress RMSE 21.61 (should be 15.98)'),
+        (r'\b93\.73\b', 'stale parametric PI width 93.73 (should be 114.39)'),
+        (r'\b93\.44%', 'stale parametric PI stress cov 93.44% (should be 97.54%)'),
+        (r'\b27\.87%', 'stale MC-dropout stress cov 27.87% (should be N/A)'),
+        (r'\b217\.0\b', 'stale Bhogi 2020-01-14 AQI 217.0 (should be 230.0)'),
+        (r'\[Group|\[Instructor|<INSTRUCTOR|Roll Numbers\]', 'unfilled template placeholder'),
     ]
 
     for label, txt in deliverable_texts.items():
@@ -268,9 +280,9 @@ def main():
             '78.81', '112.86', '103.42', '95.73',
             '40.39', '56.08', '54.48', '53.04', '61.16', '50.35',
             '0.0001', '0.0132', '0.0297', '0.0127', '0.0758',
-            '96.70', '96.15', '37.91', '63.87', '57.71',
+            '96.70', '96.15', '37.91', '63.87', '57.71', '114.39', '97.54',
             '-1.15', '-0.31', '-3.19', '+7.84', '-8.32', '+10.55',
-            '-140.78', '-92.20'
+            '-140.81', '-92.22', '134.9', '0.766', '0.729', '0.5672'
         ]
         rep_txt = deliverable_texts['Report (.docx)']
         missing_in_rep = [num for num in headline_nums if num not in rep_txt]
@@ -284,6 +296,22 @@ def main():
                 print(f"  [FOUND ISSUE] Missing in FINAL_NUMBERS: {missing_in_fn}")
         else:
             print(f"  Report Headline Check : All {len(headline_nums)} headline numbers verified against FINAL_NUMBERS.md | OK")
+
+    # 7. FIGURE-SCRIPT AUDIT CHECK (Verify no stale hardcoded plot labels remain)
+    print("\n--- 7. Auditing Figure Scripts & Flow Diagram Sources ---")
+    fig_checks = [
+        ('src/run_phase7.py', [r'N=51', r'N=4', r'AQI=265', r'148', r'57\.713', r'RMSE=14\.5\b', r'RMSE=17\.7\b', r'RMSE=20\.3\b', r'RMSE=15\.6\b']),
+        ('src/draw_flow_diagram.py', [r'r=0\.88', r'r = 0\.88', r'0\.606', r'0\.697', r'skew 2\.02', r'Fs=0\.57\b']),
+        ('src/build_ppt.py', [r'p4_seasonality_analysis\.png', r'0\.606', r'0\.697', r'148 AQI']),
+    ]
+    for fpath, bad_pats in fig_checks:
+        with open(fpath, 'r', encoding='utf-8') as ff:
+            ftxt = ff.read()
+        for pat in bad_pats:
+            if re.search(pat, ftxt):
+                mismatches.append(f"Stale figure/script pattern in {fpath}: {pat}")
+                print(f"  [FOUND ISSUE] {fpath}: matched {pat}")
+    print("  Figure script source check complete.")
 
     # Summary
     print("\n" + "=" * 70)

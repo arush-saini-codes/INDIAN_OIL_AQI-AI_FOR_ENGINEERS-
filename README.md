@@ -53,7 +53,7 @@ All metrics are computed on unscaled AQI values; authoritative figures across al
 3. **Exogenous $\text{PM}_{2.5}$ Information Drives Accuracy Across Both Paradigms**: Adding exogenous $\text{PM}_{2.5}$ to classical ARIMA lowered Test RMSE by **15.1%** ($30.58 \to 25.97$); adding the core pollutant suite (`[PM2.5, CO, O3, NO2, SO2]`) to univariate LSTM lowered Test RMSE by **12.9%** ($31.73 \to 27.63$).
 4. **Multi-Horizon 7-Day Tradeoff (Leakage-Free Epoch Selection)**: Retraining epochs for the Direct Multi-Step `Dense(7)` LSTM were chosen strictly on Validation without test leakage (mean validation RMSE across horizons minimized at **Epoch 2**, 33.88). Evaluated on 175 identical origins, the 7-day LSTM beats Persistence only at horizons $h \in [5, 6, 7]$ ($56.08$ vs $58.42$; $54.48$ vs $61.38$; $53.04$ vs $61.16$), whereas Persistence and recursive ARIMA-Fourier lead at $h \in [1\dots 4]$. Recursive ARIMA-Fourier achieves the lowest RMSE at $h=2\dots 6$, consistent with the hypothesis that deterministic seasonal harmonics constrain multi-day trajectory dispersion.
 5. **COVID-19 Lockdown Structural Break (`2020-03-01` to `2020-06-30`, Mean AQI = 78.81)**: Pure ARIMA achieved the lowest stress RMSE (13.51), followed by persistence (14.45); models using exogenous or seasonal terms (ARIMAX 17.74, multivariate CNN-LSTM 20.28) performed worst, with the LSTMs over-predicting (mean bias +7.84 / +10.55) and ARIMAX under-predicting (−8.32).
-6. **Spike Under-Prediction & Worst-Day Calendar Audit**: Across the top 10% highest AQI test days ($\text{AQI} \ge 148$), every model exhibited negative forecast bias ($-35.7$ to $-55.5$ AQI). Auditing the top 5 worst-forecast days showed that **2 of the 5 worst days** correspond to calendar-verified festivals (Diwali on `2019-10-27`, actual AQI 306, error $-140.8$; and Bhogi on `2020-01-14`, actual AQI 217, error $-92.2$), while the remaining 3 days had no matched calendar event.
+6. **Spike Under-Prediction & Worst-Day Calendar Audit**: Across the top 10% highest AQI test days ($\text{AQI} \ge 134.9$, $N=19$), every model exhibited negative forecast bias ($-27.6$ to $-55.5$ AQI). Auditing the top 5 worst-forecast days showed that **2 of the 5 worst days** correspond to calendar-verified festivals (Diwali on `2019-10-27`, actual AQI 306, error $-140.8$; and Bhogi on `2020-01-14`, actual AQI 230, error $-92.2$), while the remaining 3 days had no matched calendar event.
 7. **Uncertainty Quantification (Split-Conformal vs MC Dropout)**: Distribution-free split-conformal intervals ($q = 63.87$ for ARIMAX, $q = 57.71$ for LSTM) attained empirical test coverages of **96.70%** and **96.15%** (**98.36%** on Stress), though theoretical marginal guarantees assume exchangeability which time series with drift do not strictly satisfy. In contrast, 100-pass Monte Carlo dropout covered only **37.91%** on Test because it captures epistemic uncertainty alone.
 8. **Potential Operational Use**: Day-ahead ARIMAX(2,1,1)+F3+PM2.5 forecasts coupled with split-conformal intervals can serve as an informational early-warning input (Test AQI > 100: Precision 64.5%, Recall 76.9%, F1 = 0.702; Test AQI > 200: Precision 85.7%, Recall 60.0%, F1 = 0.706 across 10 rare event days). Because underlying CPCB records represent city-level ambient air quality rather than fence-line perimeter monitors, outputs reflect regional conditions rather than isolated CPCL Manali refinery emissions.
 
@@ -91,7 +91,7 @@ All metrics are computed on unscaled AQI values; authoritative figures across al
 │   └── dev/                       # Phase 1 & helper utilities (check_env, data_inventory, update_docs)
 ├── outputs/
 │   ├── figures/                   # 300-DPI figures (flow diagrams + p2_* to p7_*)
-│   ├── models/                    # Saved weights/scalers (git-ignored except dl_config.json)
+│   ├── models/                    # Saved weights/scalers (< 25 MB, tracked for reproducibility)
 │   └── results/                   # Evaluation CSVs, prediction logs, Optuna DB & DM matrices
 ├── docs/
 │   ├── FINAL_NUMBERS.md           # Single frozen source of truth for all headline metrics
@@ -172,6 +172,6 @@ python src/check_consistency.py
 ## Course & Credits
 
 - **Institution**: Thapar Institute of Engineering & Technology (TIET), Patiala
-- **Course**: UCS321 — Engineering Design / EST Project
-- **Group Members**: `[Group members & roll numbers]`
-- **Instructor**: `[Instructor]`
+- **Course**: UCS321 — EST Project (November 2026)
+- **Group**: Group 2W1
+- **Members**: Arush Saini (`1025230031`), Jiya Wadhwa (`1025230094`), Darsh Marwaha (`1025230032`), Tahoor (`1025230126`), Arshita Doomra (`1025230123`)

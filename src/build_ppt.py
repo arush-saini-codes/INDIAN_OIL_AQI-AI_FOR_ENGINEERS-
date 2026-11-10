@@ -198,15 +198,19 @@ def build_deck():
     r.font.italic = True
     r.font.color.rgb = RGBColor(0xCB, 0xD5, 0xE1)
 
-    tb_meta = s1.shapes.add_textbox(Inches(1.2), Inches(5.15), Inches(11.3), Inches(1.5))
+    tb_meta = s1.shapes.add_textbox(Inches(1.2), Inches(4.85), Inches(11.3), Inches(2.2))
     tf = tb_meta.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.line_spacing = 1.4
+    p.line_spacing = 1.3
     r = p.add_run()
-    r.text = "Group Members: [Group Member Names & Roll Numbers]\nInstructor: [Instructor Name]   |   Date: [Date]"
+    r.text = (
+        "Group 2W1   |   UCS321 – EST Project   |   November 2026\n"
+        "Arush Saini (1025230031)   •   Jiya Wadhwa (1025230094)   •   Darsh Marwaha (1025230032)\n"
+        "Tahoor (1025230126)   •   Arshita Doomra (1025230123)"
+    )
     r.font.name = FONT_FAMILY
-    r.font.size = Pt(20)
+    r.font.size = Pt(17)
     r.font.color.rgb = WHITE
 
     set_notes(s1, (
@@ -369,19 +373,19 @@ def build_deck():
     add_header_and_footer(s6, "EDA 1: Trend, Seasonality & Key Drivers", 6)
 
     add_bullets_box(s6, 0.6, 1.45, 5.2, 5.2, [
-        ("Downward Drift:", "Mean AQI fell from 112.86 (Train) to 95.73 (Test)."),
-        ("Annual Cycle:", "Winter (Nov–Jan) peaks highest; monsoon (Jun–Aug) lowest."),
-        ("No Weekly Cycle:", "Day-of-week averages stay flat (~3 AQI variation)."),
-        ("Primary Driver:", "PM2.5 correlates most strongly with next-day AQI (r = 0.606)."),
+        ("Downward Drift:", "Mean AQI fell from 112.86 (Train) to 95.73 (Test); slope \u22127.62/yr."),
+        ("STL Seasonality:", "Annual seasonal strength Fs = 0.567; negligible weekly (Fs = 0.008)."),
+        ("No Weekly Cycle:", "Day-of-week averages stay flat across the week."),
+        ("Primary Driver:", "PM2.5 correlates strongly with next-day AQI (lag-1 r = 0.729)."),
     ], font_size=20, space_after=18)
-    add_picture_fitted(s6, "outputs/figures/p4_seasonality_analysis.png", 5.95, 1.35, 6.85, 5.45)
+    add_picture_fitted(s6, "outputs/figures/p4_stl_decomposition.png", 5.95, 1.35, 6.85, 5.45)
 
     set_notes(s6, (
-        "Looking at exploratory analysis, seasonal boxplots reveal two key patterns on the training data. First, there is a clear "
-        "multi-year downward trend in AQI from 112.86 in Train down to 95.73 in Test. Second, annual seasonality is strong, driven "
-        "by winter inversion peaks from November to January and monsoon washout lows from June to August, while weekly day-of-week "
-        "averages remain essentially flat. Over 93 percent of days fall in the Satisfactory or Moderate CPCB bands. Finally, PM2.5 "
-        "is the strongest chemical predictor for next-day AQI, with a lag-1 correlation of 0.606."
+        "Looking at exploratory analysis, STL decomposition and descriptive diagnostics reveal clear patterns on the training data. "
+        "First, there is a multi-year downward trend in AQI from 112.86 in Train down to 95.73 in Test, with a slope of minus 7.62 AQI per year. "
+        "Second, STL shows strong annual seasonality with strength Fs equal to 0.567—driven by winter inversion peaks and monsoon washout lows—"
+        "while weekly seasonality is essentially zero at 0.008. Finally, PM2.5 is the strongest chemical predictor for next-day AQI, with a "
+        "lag-1 correlation of 0.729."
     ))
 
     # =========================================================================
@@ -391,9 +395,9 @@ def build_deck():
     add_header_and_footer(s7, "EDA 2: Stationarity & Differencing (d=0 vs d=1)", 7)
 
     add_bullets_box(s7, 0.6, 1.45, 5.2, 5.2, [
-        ("Conflicting Raw Tests:", "Raw ADF p = 1.17e-6 vs KPSS p = 0.01."),
-        ("Differencing (d=1):", "Both agree stationary: ADF p = 5.77e-24, KPSS p = 0.10."),
-        ("PACF Lag-1 Cutoff:", "Sharp lag-1 PACF (0.697) guides low AR order."),
+        ("Conflicting Raw Tests:", "Raw ADF p = 9.05e-7 vs KPSS p = 0.01."),
+        ("Differencing (d=1):", "Both agree stationary: ADF p = 1.99e-27, KPSS p = 0.10."),
+        ("PACF Lag-1 Cutoff:", "Sharp lag-1 PACF (0.678) guides low AR order."),
         ("d=1 Beats d=0:", "Validation shows d=1 (RMSE 28.91 vs 30.13) tracks drift."),
     ], font_size=20, space_after=18)
     add_picture_fitted(s7, "outputs/figures/p4_acf_pacf.png", 5.95, 1.35, 6.85, 5.45)
@@ -435,7 +439,7 @@ def build_deck():
     add_header_and_footer(s9, "Deep Learning Track: Staged LSTM Pipeline", 9)
 
     add_bullets_box(s9, 0.6, 1.45, 5.4, 5.2, [
-        ("Stage 1 (80 runs):", "Lookback L=7 with CORE features won (Val RMSE 27.88)."),
+        ("Stage 1 (80 runs):", "Lookback L=7 with CORE features won (Val RMSE 27.38)."),
         ("Stage 2 (40 runs):", "CNN-LSTM beat GRU, BiLSTM, Stacked LSTM (26.24)."),
         ("Stage 3 (60 trials):", "Optuna TPE tuned units (80,48), Huber loss (Val 25.50)."),
         ("5-Seed Ensembles:", "Retrained on Train+Val; plus Hybrid & Direct 7-Day."),
@@ -445,7 +449,7 @@ def build_deck():
     set_notes(s9, (
         "For deep learning, instead of guessing one LSTM architecture, we ran a structured three-stage search with 5 random seeds "
         "each. First, an 80-run grid crossed four feature sets with four lookbacks, showing that a short 7-day window with CORE "
-        "pollutants performed best at 27.88 Validation RMSE. Second, our 40-run tournament crowned a 1-D CNN-LSTM architecture at "
+        "pollutants performed best at 27.38 Validation RMSE. Second, our 40-run tournament crowned a 1-D CNN-LSTM architecture at "
         "26.24 RMSE. Third, 60 Optuna Bayesian trials tuned hyperparameters with Huber loss, reaching 25.50 on Validation before "
         "retraining 5-seed ensembles on Train plus Validation."
     ))
@@ -509,16 +513,16 @@ def build_deck():
 
     add_picture_fitted(s11, "outputs/figures/p7_test_overlay_zoomed.png", 0.55, 1.3, 8.0, 5.5)
     add_bullets_box(s11, 8.75, 1.65, 4.05, 4.9, [
-        ("Close Baseline Tracking:", "Normal days (<148 AQI) tracked with 18.78 ARIMAX RMSE."),
-        ("Festival Failure Mode:", "2 of top 5 worst days: Diwali (-140.8), Bhogi (-92.2)."),
+        ("Close Baseline Tracking:", "Normal days (<134.9 AQI) tracked with 18.78 ARIMAX RMSE."),
+        ("Festival Failure Mode:", "2 of top 5 worst days: Diwali (306, err -140.8), Bhogi (230, err -92.2)."),
         ("Non-Matched Spikes:", "Remaining 3 worst days reflect unmodeled stagnation."),
     ], font_size=20, space_after=20)
 
     set_notes(s11, (
-        "This overlay shows daily predictions on the Test window with a zoomed inset on Diwali 2019. On normal days below 148 AQI, "
+        "This overlay shows daily predictions on the Test window with a zoomed inset on Diwali 2019. On normal days below 134.9 AQI, "
         "ARIMAX tracks observations closely with 18.78 RMSE. However, every model under-predicts sudden spikes because preceding-day "
         "sensors cannot see unannounced events. Auditing the 5 worst-forecast days, exactly 2 match verified cultural festivals: "
-        "Diwali on October 27 where AQI hit 306 and models missed by over 140 points, and Bhogi on January 14. The remaining 3 "
+        "Diwali on October 27 where AQI hit 306 and models missed by over 140 points, and Bhogi on January 14 where AQI hit 230. The remaining 3 "
         "worst days have no calendar match."
     ))
 
@@ -714,8 +718,8 @@ def build_deck():
     r = p.add_run()
     r.text = (
         "UCS321 – EST Project  |  Thapar Institute of Engineering & Technology\n"
-        "Champion Model: ARIMAX(2,1,1) + Fourier(K=3) + PM2.5  |  Test RMSE: 25.97\n"
-        "[Group Member Names & Roll Numbers]"
+        "November 2026  |  Champion Model: ARIMAX(2,1,1) + Fourier(K=3) + PM2.5 (RMSE: 25.97)\n"
+        "Group 2W1: Arush Saini, Jiya Wadhwa, Darsh Marwaha, Tahoor, Arshita Doomra"
     )
     r.font.name = FONT_FAMILY
     r.font.size = Pt(20)

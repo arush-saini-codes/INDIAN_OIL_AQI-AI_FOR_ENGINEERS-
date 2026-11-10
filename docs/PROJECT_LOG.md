@@ -489,37 +489,37 @@ Phase 3 executes the complete data preparation and feature engineering pipeline 
 ## 1. Key Analytical Findings & Clarifications
 
 1. **Descriptive Statistics & Anomaly Removal:**
-   - Train AQI mean is $114.07 \pm 48.79$, Validation is $103.42 \pm 36.72$, Test is $95.73 \pm 45.03$, and Stress-Test is $78.81 \pm 20.38$.
-   - Train AQI skewness is $1.89$ and kurtosis is $5.69$.
+   - Train AQI mean is $112.86 \pm 46.91$, Validation is $103.42 \pm 36.72$, Test is $95.73 \pm 45.03$, and Stress-Test is $78.81 \pm 20.38$.
+   - Train AQI skewness is $1.64$ and kurtosis is $4.73$.
 2. **Annual AQI Summary & Volatility (2016–2019):**
 
 | Year | Count | Mean AQI | Std AQI | Min AQI | Max AQI |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| **2016** | 366 | **132.18** | **48.69** | 30.00 | 370.00 |
+| **2016** | 366 | **128.71** | **45.16** | 30.00 | 370.00 |
 | **2017** | 365 | 104.34 | 50.67 | 43.00 | 431.00 |
 | **2018** | 365 | 105.49 | 40.34 | 53.00 | 258.00 |
 | **2019** | 365 | 102.94 | 41.67 | 47.00 | 306.00 |
 
-   - *Note:* Calendar year 2016 is notably higher in mean ($132.18$) and volatility (std $48.69$) than 2017–2019 ($103–105$ mean, std $\approx 40$).
-   - OLS linear trend slope across annual means is **$-8.658$ AQI points/year**.
+   - *Note:* Calendar year 2016 is notably higher in mean ($128.71$) and volatility (std $45.16$) than 2017–2019 ($103–105$ mean, std $\approx 40$).
+   - OLS linear trend slope across annual means is **$-7.616$ AQI points/year**.
 3. **Seasonality & Absence of Weekend Effect:**
-   - Winter records highest levels ($125.72 \pm 47.77$), while SW Monsoon records lowest levels ($99.30 \pm 42.61$).
-   - Day-of-week averages show virtually zero variation (Mon $105.77$ to Wed $114.73$, Sun $111.08$; cross-day std $\approx 2.9$), indicating absence of a weekly cycle.
+   - Winter records highest levels ($126.67 \pm 49.83$), while SW Monsoon records lowest levels ($96.30 \pm 32.47$).
+   - Day-of-week averages show minimal variation (Mon $106.49$ to Sat $116.13$, Sun $112.77$; cross-day std $\approx 3.34$), indicating absence of a weekly cycle.
 4. **CPCB Category Distribution:**
    - $>93\%$ of days fall into Satisfactory ($51–100$) and Moderate ($101–200$). Good, Very Poor, and Severe represent $<1.5\%$.
 5. **Pollutant Relationships (Train only):**
-   - $\text{PM}_{2.5}$ is the strongest predictive criteria pollutant for AQI (Pearson $r = 0.655$, Spearman $\rho = 0.704$), with lag-0 cross-correlation of $0.606$ against next-day $\text{AQI}(t+1)$.
-   - $\text{NO}_2$ and $\text{SO}_2$ have minimal linear correlation with next-day AQI ($|r| < 0.06$).
+   - $\text{PM}_{2.5}$ is the strongest predictive criteria pollutant for AQI (Pearson $r = 0.766$, Spearman $\rho = 0.731$), with lag-0 cross-correlation of $0.729$ ($\rho = 0.746$) against next-day $\text{AQI}(t+1)$, followed by $\text{O}_3$ ($0.286$) and $\text{CO}$ ($0.103$).
+   - $\text{NO}_2$ ($0.016$) and $\text{SO}_2$ ($0.046$) have minimal linear correlation with next-day AQI.
 6. **STL Decomposition (Train only):**
-   - Annual seasonal strength ($m=365$): $F_s = \mathbf{0.5520}$.
-   - Weekly seasonal strength ($m=7$): $F_s = \mathbf{0.0000}$.
+   - Annual seasonal strength ($m=365$): $F_s = \mathbf{0.5672}$.
+   - Weekly seasonal strength ($m=7$): $F_s = \mathbf{0.0079}$.
 7. **Stationarity Diagnostics (Train only):**
-   - Raw AQI: ADF stat $= -5.6173$ ($p = 1.17 \times 10^{-6}$), KPSS stat $= 1.2982$ ($p = 0.01$).
-   - Differenced AQI ($d=1$): ADF stat $= -12.8349$ ($p = 5.77 \times 10^{-24}$), KPSS stat $= 0.1500$ ($p = 0.10$).
+   - Raw AQI: ADF stat $= -5.6682$ ($p = 9.05 \times 10^{-7}$), KPSS stat $= 1.1417$ ($p = 0.01$).
+   - Differenced AQI ($d=1$): ADF stat $= -14.8172$ ($p = 1.99 \times 10^{-27}$), KPSS stat $= 0.0856$ ($p = 0.10$).
    - *Verdict:* Series is stationary per ADF and KPSS after first differencing ($d=1$).
 8. **Long-Lag ACF & Over-Differencing Signature (Train only):**
-   - The exact autocorrelation at lag 365 is **$r = 0.0618$**, which is right at the edge of the 95% Bartlett confidence band ($\pm 0.0592$). Annual seasonality is visible in STL and monthly averages, but produces weak linear autocorrelation in daily ACF.
-   - The differenced series exhibits negative ACF at lags 1 and 2 ($-0.171, -0.149$) and prolonged negative PACF across lags 1 through 9. This is a classic **over-differencing signature**.
+   - The exact autocorrelation at lag 365 is **$r = 0.0816$**, just above the 95% Bartlett confidence band ($\pm 0.0592$). Annual seasonality is visible in STL and monthly averages, but produces modest linear autocorrelation in daily ACF.
+   - The differenced series exhibits negative ACF at lags 1 and 2 ($-0.152, -0.170$) and prolonged negative PACF across lags 1 through 9. This is a classic **over-differencing signature**.
    - Together with ADF rejecting a unit root on raw AQI ($p = 1.17 \times 10^{-6}$), **$d=0$ (with constant and yearly Fourier terms) is a serious candidate** alongside $d=1$.
 9. **COVID-19 Lockdown Impact:**
    - Primary combustion pollutants fell drastically: $\text{NO}_2$ dropped by $-52.24\%$, $\text{PM}_{2.5}$ by $-46.56\%$, AQI by $-17.40\%$.
@@ -549,9 +549,9 @@ $$\mathbf{M3~\text{ARIMAX}(2, 1, 1) + \text{Fourier}(K=3) + \text{PM}_{2.5}(t-1)
   - 6 deterministic Fourier harmonic terms ($K=3$, annual period $365.25$ days) capturing annual cyclicality.
   - Lagged fine particulate matter $\text{PM}_{2.5}(t-1)$ as a 1-day dynamic regressor.
 - **Training Window:** Full 3-year history (`2016-01-01` $\rightarrow$ `2018-12-31`, $N=1,096$ days).
-- **Validation RMSE:** **$28.930$** (Validation MAE: **$17.405$**, AIC: **$10660.52$**).
-- **Out-of-Sample Test RMSE:** **$25.550$** (an **$20.4\%$ error reduction over Persistence** at $32.10$).
-- **95% Prediction Interval Coverage:** **$96.70\%$** on Test partition.
+- **Validation RMSE:** **$28.907$** (Validation MAE: **$17.333$**, AIC: **$10533.66$**).
+- **Out-of-Sample Test RMSE:** **$25.965$** (a **$19.1\%$ error reduction over Persistence** at $32.10$).
+- **95% Prediction Interval Coverage:** **$96.15\%$** (Parametric Gaussian, mean width $114.39$) on Test partition.
 
 ---
 
@@ -559,15 +559,15 @@ $$\mathbf{M3~\text{ARIMAX}(2, 1, 1) + \text{Fourier}(K=3) + \text{PM}_{2.5}(t-1)
 
 ```
 1. Benchmark Baselines       -> Persistence (test RMSE 32.10), 7-day MA (42.44), Seasonal Naive (71.61).
-2. M1 Grid Search (ARIMA)    -> 32 models: p,q in 0..3, d in {0,1}. Best d=0: (3,0,3) RMSE 30.34; Best d=1: (3,1,3) RMSE 30.35.
-3. M2 Grid Search (Fourier)  -> Add annual Fourier K in {1,2,3}. Best: ARIMAX(1,1,1)+F3 (val RMSE 30.156).
-4. M3 Grid Search (+PM2.5)   -> Add PM2.5(t-1). Final: ARIMAX(2,1,1)+F3+PM25 (val RMSE 28.930, AIC 10660.52).
-5. Differencing Comparison   -> d=1 beats d=0 (val RMSE 28.93 vs 29.63, AIC 10660.52 vs 10675.76).
-6. Training Sensitivity      -> 2016-18 (N=1096, RMSE 28.93) beats 2017-18 (N=730, RMSE 29.92). Keep 2016 start.
-7. Residual Diagnostics      -> Unbiased mean (-0.19), Ljung-Box p=0.0789 at lag 20 (white noise), leptokurtic tails (Diwali).
-8. Walk-Forward Test (1d)    -> 182 daily steps (refit=False): RMSE 25.550, MAE 17.534, R2 0.6763, 95% PI coverage 96.70%.
-9. Multi-Step Test (1..7d)   -> Model error grows smoothly to 49.66 at h=7 vs Persistence 61.16 (18.8% gain).
-10. Stress-Test Window       -> Mar-Jun 2020: RMSE 16.931, MAE 11.443, 95% PI coverage 98.36% under lockdown regime break.
+2. M1 Grid Search (ARIMA)    -> 32 models: p,q in 0..3, d in {0,1}. Best d=1: (2,1,1) RMSE 30.49; Best d=0: (3,0,1)/(1,0,0).
+3. M2 Grid Search (Fourier)  -> Add annual Fourier K in {1,2,3}. Best: ARIMAX(1,1,1)+F3 (val RMSE 30.124).
+4. M3 Grid Search (+PM2.5)   -> Add PM2.5(t-1). Final: ARIMAX(2,1,1)+F3+PM25 (val RMSE 28.907, AIC 10533.66).
+5. Differencing Comparison   -> d=1 beats d=0 (val RMSE 28.907 vs 30.128, AIC 10533.66 vs 10601.14).
+6. Training Sensitivity      -> 2016-18 (N=1096, RMSE 28.907) beats 2017-18 (N=730, RMSE 29.920). Keep 2016 start.
+7. Residual Diagnostics      -> Unbiased mean (-0.273), Ljung-Box p=0.6073 at lag 20 (white noise), leptokurtic tails (Diwali).
+8. Walk-Forward Test (1d)    -> 182 daily steps (refit=False): RMSE 25.965, MAE 18.447, R2 0.6657, 95% PI coverage 96.15%.
+9. Multi-Step Test (1..7d)   -> Model error grows smoothly to 50.35 at h=7 vs Persistence 61.16 (17.7% gain).
+10. Stress-Test Window       -> Mar-Jun 2020: RMSE 17.740, MAE 12.368, 95% PI coverage 97.54% under lockdown regime break.
 ```
 
 ---
@@ -580,30 +580,30 @@ $$\mathbf{M3~\text{ARIMAX}(2, 1, 1) + \text{Fourier}(K=3) + \text{PM}_{2.5}(t-1)
 
 | Rank | Model Family | Order $(p,d,q)$ | Fourier $K$ | Has $\text{PM}_{2.5}$ | AIC | BIC | Val RMSE | Val MAE | Convergence |
 | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **1** | **M3 ARIMAX** | **(2, 1, 1)** | **3** | **True** | **10660.52** | **10715.50** | **28.930** | **17.405** | **True** |
-| 2 | M3 ARIMAX | (2, 1, 2) | 3 | True | 10661.12 | 10721.10 | 29.027 | 17.500 | True |
-| 3 | M3 ARIMAX | (1, 1, 2) | 3 | True | 10663.60 | 10713.58 | 29.199 | 17.623 | True |
-| 4 | M3 ARIMAX | (1, 1, 1) | 1 | True | 10667.88 | 10707.86 | 30.081 | 17.910 | True |
-| 5 | M3 ARIMAX | (1, 1, 1) | 3 | True | 10680.04 | 10730.02 | 30.103 | 18.182 | True |
+| **1** | **M3 ARIMAX** | **(2, 1, 1)** | **3** | **True** | **10533.66** | **10588.65** | **28.907** | **17.333** | **True** |
+| 2 | M3 ARIMAX | (1, 1, 2) | 3 | True | 10527.14 | 10582.12 | 29.278 | 17.690 | True |
+| 3 | M2 ARIMAX | (1, 1, 1) | 3 | False | 10853.91 | 10898.90 | 30.124 | 19.966 | True |
+| 4 | M3 ARIMAX | (1, 0, 0) | 3 | True | 10601.14 | 10651.14 | 30.128 | 18.164 | True |
+| 5 | M3 ARIMAX | (1, 1, 1) | 1 | True | 10550.26 | 10580.25 | 30.153 | 18.038 | True |
 
 - **Best $d=0$ vs Best $d=1$ Comparison:**
-  - Best $d=0$: $\text{ARIMAX}(2, 0, 1) + \text{Fourier}(K=3) + \text{PM}_{2.5}(t-1)$ $\rightarrow$ Val RMSE $= 29.630$, Val MAE $= 17.859$, AIC $= 10675.76$.
-  - Best $d=1$: $\text{ARIMAX}(2, 1, 1) + \text{Fourier}(K=3) + \text{PM}_{2.5}(t-1)$ $\rightarrow$ Val RMSE $= \mathbf{28.930}$, Val MAE $= \mathbf{17.405}$, AIC $= \mathbf{10660.52}$.
+  - Best $d=0$: $\text{ARIMAX}(1, 0, 0) + \text{Fourier}(K=3) + \text{PM}_{2.5}(t-1)$ $\rightarrow$ Val RMSE $= 30.128$, Val MAE $= 18.164$, AIC $= 10601.14$.
+  - Best $d=1$: $\text{ARIMAX}(2, 1, 1) + \text{Fourier}(K=3) + \text{PM}_{2.5}(t-1)$ $\rightarrow$ Val RMSE $= \mathbf{28.907}$, Val MAE $= \mathbf{17.333}$, AIC $= \mathbf{10533.66}$.
   - *Why $d=1$ wins:* While $d=0$ avoids over-differencing, daily ambient air pollution is subject to localized multi-day baseline shifts. First-differencing ($d=1$) naturally anchors predictions to the most recent day's level $y(t)$, tracking sudden shifts with lower lag error than $d=0$.
 
 ### Training-Window Sensitivity Results
-- **Full Window (`2016-01-01` $\rightarrow$ `2018-12-31`, $N=1,096$):** Val RMSE $= \mathbf{28.930}$, Val MAE $= \mathbf{17.405}$, AIC $= 10660.52$.
+- **Full Window (`2016-01-01` $\rightarrow$ `2018-12-31`, $N=1,096$):** Val RMSE $= \mathbf{28.907}$, Val MAE $= \mathbf{17.333}$, AIC $= 10533.66$.
 - **Truncated Window (`2017-01-01` $\rightarrow$ `2018-12-31`, $N=730$):** Val RMSE $= 29.920$, Val MAE $= 18.665$, AIC $= 6992.70$.
-- *Conclusion:* Retaining 2016 provides three complete annual cycles to calibrate the $K=3$ Fourier harmonics, reducing validation RMSE by $0.99$ points. Full 2016–2018 training start is retained.
+- *Conclusion:* Retaining 2016 provides three complete annual cycles to calibrate the $K=3$ Fourier harmonics, reducing validation RMSE by $1.01$ points. Full 2016–2018 training start is retained.
 
 ### Residual Diagnostics Verdict
-- **Residual Mean:** $-0.19$ (zero-mean property satisfied; unbiased estimator).
-- **Residual Std:** $30.71$.
+- **Residual Mean:** $-0.273$ (zero-mean property satisfied; unbiased estimator).
+- **Residual Std:** $29.248$.
 - **Ljung–Box Independence Test:**
-  - Lag 10: Stat $= 18.97$, $p$-value $= 0.0406$ (statistically significant at $\alpha = 0.05$).
-  - Lag 20: Stat $= 29.47$, $p$-value $= 0.0789 > 0.05$ (fails to reject null at higher lags).
-  - *Verdict:* Residuals are close to white noise; mild short-lag autocorrelation remains.
-- **Distribution:** Q-Q plot and KDE demonstrate that the residual core is Gaussian, with heavy positive tails (skewness $1.36$, kurtosis $9.65$) reflecting episodic peaks such as Diwali.
+  - Lag 10: Stat $= 10.61$, $p$-value $= 0.3889 > 0.05$ (fails to reject white noise).
+  - Lag 20: Stat $= 17.70$, $p$-value $= 0.6073 > 0.05$ (fails to reject white noise).
+  - *Verdict:* Residuals show no significant remaining linear autocorrelation.
+- **Distribution:** Q-Q plot and KDE demonstrate that the residual core is Gaussian, with heavy positive tails (skewness $1.384$, kurtosis $10.868$) reflecting episodic peaks such as Diwali.
 
 ### Comprehensive Performance Table (1-Day Horizon, Full Test Set N=182 Days)
 - **Saved Results:** [`outputs/results/p5_metrics.csv`](../outputs/results/p5_metrics.csv)
@@ -708,40 +708,40 @@ $$\text{ARIMA-Fourier (multi-step)} \quad \text{vs} \quad \text{Persistence (Sam
 
 | Rank | Feature Set | Lookback $L$ (Days) | Features ($D$) | Mean Val RMSE | Std Val RMSE | Selection Status |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **1** | **C (CORE5)** | **7** | **8** | **27.878** | **0.505** | **Selected (Top 1)** |
-| **2** | **P (Parsimonious)** | **7** | **6** | **28.176** | **0.252** | **Selected (Top 2)** |
-| 3 | C (CORE5) | 14 | 8 | 28.106 | 0.814 | Candidate |
-| 4 | P (Parsimonious) | 14 | 6 | 28.106 | 0.817 | Candidate |
-| 5 | A (ALL9) | 7 | 12 | 28.188 | 0.228 | Candidate |
-| 6 | P (Parsimonious) | 30 | 6 | 28.196 | 0.706 | Candidate |
-| 7 | C (CORE5) | 30 | 8 | 28.450 | 0.655 | Candidate |
-| 8 | A (ALL9) | 14 | 12 | 28.528 | 0.835 | Candidate |
-| 9 | P (Parsimonious) | 60 | 6 | 28.596 | 0.540 | Candidate |
-| 10 | A (ALL9) | 30 | 12 | 28.666 | 0.785 | Candidate |
-| 11 | C (CORE5) | 60 | 8 | 28.720 | 0.536 | Candidate |
-| 12 | A (ALL9) | 60 | 12 | 28.840 | 0.638 | Candidate |
-| 13 | U (Univariate) | 7 | 3 | 29.764 | 0.262 | Baseline |
-| 14 | U (Univariate) | 30 | 3 | 29.750 | 0.155 | Baseline |
-| 15 | U (Univariate) | 60 | 3 | 29.806 | 0.134 | Baseline |
-| 16 | U (Univariate) | 14 | 3 | 29.986 | 0.490 | Baseline |
+| **1** | **C (CORE5)** | **7** | **8** | **27.375** | **0.513** | **Selected (Top 1)** |
+| **2** | **C (CORE5)** | **14** | **8** | **27.906** | **0.213** | **Selected (Top 2)** |
+| 3 | C (CORE5) | 60 | 8 | 27.924 | 0.301 | Candidate |
+| 4 | C (CORE5) | 30 | 8 | 27.973 | 0.318 | Candidate |
+| 5 | P (Parsimonious) | 14 | 6 | 28.106 | 0.826 | Candidate |
+| 6 | P (Parsimonious) | 7 | 6 | 28.177 | 0.253 | Candidate |
+| 7 | A (ALL9) | 7 | 12 | 28.195 | 0.318 | Candidate |
+| 8 | P (Parsimonious) | 30 | 6 | 28.470 | 0.821 | Candidate |
+| 9 | P (Parsimonious) | 60 | 6 | 28.499 | 0.385 | Candidate |
+| 10 | A (ALL9) | 14 | 12 | 28.645 | 0.192 | Candidate |
+| 11 | A (ALL9) | 60 | 12 | 28.780 | 0.488 | Candidate |
+| 12 | A (ALL9) | 30 | 12 | 28.881 | 0.385 | Candidate |
+| 13 | U (Univariate) | 7 | 3 | 29.765 | 0.259 | Baseline |
+| 14 | U (Univariate) | 30 | 3 | 29.769 | 0.155 | Baseline |
+| 15 | U (Univariate) | 60 | 3 | 29.802 | 0.124 | Baseline |
+| 16 | U (Univariate) | 14 | 3 | 29.986 | 0.469 | Baseline |
 
-- *Key Finding:* A compact lookback of **7 days** with the **CORE5 feature set** ($D=8$) achieved the lowest validation error ($27.88 \pm 0.51$), confirming the Phase 4 EDA insight that criteria pollutant cross-correlations decay beyond 3–7 lags.
+- *Key Finding:* A compact lookback of **7 days** with the **CORE5 feature set** ($D=8$) achieved the lowest validation error ($27.38 \pm 0.51$), confirming the Phase 4 EDA insight that criteria pollutant cross-correlations decay beyond 3–7 lags.
 
 ### Stage 2: Architecture Tournament (40 Runs, 5 Seeds)
-Evaluated across top 2 configurations (C, $L=7$) and (P, $L=7$):
+Evaluated across top 2 configurations (C, $L=7$) and (C, $L=14$):
 
 | Rank | Architecture | Feature Set | Lookback $L$ | Mean Val RMSE | Std Val RMSE | Selection Status |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **1** | **CNN_LSTM** | **C** | **7** | **26.241** | **1.043** | **WINNER (Selected)** |
-| 2 | Stacked_GRU | C | 7 | 27.240 | 0.900 | Runner-up |
-| 3 | Stacked_GRU | P | 7 | 27.420 | 0.530 | Runner-up |
-| 4 | CNN_LSTM | P | 7 | 27.600 | 0.470 | Runner-up |
-| 5 | BiLSTM | C | 7 | 27.780 | 0.430 | Runner-up |
-| 6 | Stacked_LSTM | C | 7 | 27.878 | 0.505 | Baseline |
-| 7 | BiLSTM | P | 7 | 28.110 | 0.380 | Runner-up |
-| 8 | Stacked_LSTM | P | 7 | 28.176 | 0.252 | Baseline |
+| 2 | Stacked_GRU | C | 14 | 27.148 | 0.377 | Runner-up |
+| 3 | Stacked_GRU | C | 7 | 27.207 | 0.443 | Runner-up |
+| 4 | Stacked_LSTM | C | 7 | 27.375 | 0.513 | Baseline |
+| 5 | BiLSTM | C | 7 | 27.427 | 1.209 | Runner-up |
+| 6 | Stacked_LSTM | C | 14 | 27.906 | 0.213 | Baseline |
+| 7 | CNN_LSTM | C | 14 | 27.913 | 0.788 | Runner-up |
+| 8 | BiLSTM | C | 14 | 28.839 | 0.484 | Runner-up |
 
-- *Key Finding:* **Conv1D-LSTM** achieved the lowest validation RMSE of $26.24 \pm 1.04$ (vs $27.24 \pm 0.81$ for GRU and $27.88 \pm 0.51$ for Stacked LSTM).
+- *Key Finding:* **Conv1D-LSTM** achieved the lowest validation RMSE of $26.24 \pm 1.04$ (vs $27.15 \pm 0.38$ for GRU $L=14$, $27.21 \pm 0.44$ for GRU $L=7$, and $27.38 \pm 0.51$ for Stacked LSTM).
 
 ### Stage 3: Optuna Bayesian Hyperparameter Optimization
 - **Database:** [`outputs/results/p6_optuna.db`](../outputs/results/p6_optuna.db) (SQLite)
@@ -778,20 +778,20 @@ Evaluated across top 2 configurations (C, $L=7$) and (P, $L=7$):
   - 100 stochastic forward passes per seed ($500$ passes total).
   - Empirical $95\%$ Prediction Interval Coverage: **$37.91\%$**
   - Mean Prediction Interval Width: **$31.69$** AQI units
-  - *Comparison with ARIMAX ($96.70\%$ coverage, width $93.73$):* MC dropout captures **epistemic uncertainty** (model parameter uncertainty), yielding narrow intervals ($31.7$ units) that highlight confident predictions but suffer undercoverage when aleatoric sensor noise dominates. ARIMAX prediction intervals reflect Gaussian **aleatoric noise** ($\sigma_\epsilon^2$), achieving high coverage at the expense of wide intervals ($93.7$ units).
+  - *Comparison with ARIMAX ($96.15\%$ parametric coverage, width $114.39$):* MC dropout captures **epistemic uncertainty** (model parameter uncertainty), yielding narrow intervals ($31.69$ units) that highlight confident predictions but suffer undercoverage when aleatoric sensor noise dominates. ARIMAX parametric intervals reflect Gaussian **aleatoric noise** ($\sigma_\epsilon^2$), achieving high coverage at the expense of wide intervals ($114.39$ units).
 
 ### Stage 5: Direct Multi-Step Horizon Evaluation (Horizons 1 to 7)
-Evaluated on the exact same $175$ forecast origins from Phase 5 (`p5_multistep_origins.csv`):
+Evaluated on the exact same $175$ forecast origins from Phase 5 (`p5_multistep_origins.csv`; validation-selected Epoch 2 retraining):
 
 | Horizon $h$ (Days Ahead) | LSTM Direct Dense(7) RMSE | ARIMA-Fourier RMSE | Persistence RMSE |
 | :---: | :---: | :---: | :---: |
-| **$h = 1$** | **30.11** | 32.25 | 32.10 |
-| **$h = 2$** | 47.05 | **42.83** | 44.76 |
-| **$h = 3$** | 54.13 | **46.05** | 49.77 |
-| **$h = 4$** | 57.09 | **47.83** | 52.61 |
-| **$h = 5$** | 57.67 | **49.33** | 57.94 |
-| **$h = 6$** | 57.23 | **50.06** | 61.02 |
-| **$h = 7$** | **57.75** | **50.35** | 60.61 |
+| **$h = 1$** | 40.39 | **32.25** | 32.72 |
+| **$h = 2$** | 47.30 | **42.83** | 47.14 |
+| **$h = 3$** | 51.46 | **46.05** | 51.01 |
+| **$h = 4$** | 54.42 | **47.83** | 53.46 |
+| **$h = 5$** | 56.08 | **49.33** | 58.42 |
+| **$h = 6$** | 54.48 | **50.06** | 61.38 |
+| **$h = 7$** | 53.04 | **50.35** | 61.16 |
 
 - *Operational Note:* The direct multi-step LSTM uses strictly available information at origin $t$. At $h=1$, the direct multi-step LSTM achieves RMSE of **30.11**, outperforming persistence (32.10) and ARIMA-Fourier (32.25). At $h=7$, it achieves RMSE of **57.75**, outperforming persistence (60.61). For intermediate horizons $h=2\dots 6$, ARIMA-Fourier performs best due to annual Fourier harmonic constraints bounding trajectory dispersion.
 
@@ -956,10 +956,10 @@ Evaluated on regulatory intervention thresholds on the Test partition ($N=182$ d
 ## 6. Stratified Error Diagnostics & Calendar Event Audit
 
 ### 6.1 Performance Disparity on Normal Days vs Top 10% Spikes
-- **Normal Days (Bottom 90%, $N=163$, actual AQI $< 148$):**
-  - ARIMAX RMSE: **18.78**, MAE: **14.97**, Bias: **+1.22**
-  - LSTM RMSE: **21.07**, MAE: **17.97**, Bias: **+2.35**
-- **Spike Days (Top 10%, $N=19$, actual AQI $\ge 148$):**
+- **Normal Days (Bottom 90%, $N=163$, actual AQI $< 134.9$):**
+  - ARIMAX RMSE: **18.78**, MAE: **14.97**, Bias: **+9.56**
+  - LSTM RMSE: **21.07**, MAE: **17.97**, Bias: **+14.57**
+- **Spike Days (Top 10%, $N=19$, actual AQI $\ge 134.9$):**
   - ARIMAX RMSE: **58.58**, MAE: **48.24**, Bias: **-36.83**
   - LSTM RMSE: **59.22**, MAE: **49.05**, Bias: **-39.09**
   - Pure ARIMA RMSE: **74.57**, MAE: **58.93**, Bias: **-55.54**
@@ -1014,8 +1014,8 @@ Evaluated with finite-sample corrected 95% conformal quantile $q = \text{Quantil
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **Split-Conformal PI** | ARIMAX | 63.87 | 127.74 | **96.70%** (176/182) | **98.36%** (120/122) |
 | **Split-Conformal PI** | LSTM Ensemble | 57.71 | 115.43 | **96.15%** (175/182) | **98.36%** (120/122) |
-| **Parametric Gaussian PI** | ARIMAX | N/A | 93.73 | **96.70%** (176/182) | 93.44% (114/122) |
-| **MC-Dropout PI** | LSTM Ensemble | N/A | 31.69 | **37.91%** (69/182) | 27.87% (34/122) |
+| **Parametric Gaussian PI** | ARIMAX | N/A | 114.39 | **96.15%** (175/182) | 97.54% (119/122) |
+| **MC-Dropout PI** | LSTM Ensemble | N/A | 31.69 | **37.91%** (69/182) | N/A (not saved for Stress) |
 
 *Key finding:* Split-conformal prediction intervals achieved 96.70% empirical coverage on test. The theoretical finite-sample guarantee assumes data exchangeability, which time series with drift do not strictly satisfy. In contrast, MC-dropout undercovers at 37.91% because it captures only epistemic model parameter variance.
 
