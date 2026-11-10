@@ -12,10 +12,112 @@ Includes all corrections from user request:
 
 import os
 import nbformat as nbf
+import numpy as np
+import pandas as pd
+from statsmodels.tsa.stattools import adfuller, kpss, acf, pacf
+from statsmodels.tsa.seasonal import STL
 from nbconvert.preprocessors import ExecutePreprocessor
 
 
+def _compute_eda_markdown_stats():
+    """Compute exact Train/Full EDA, STL, stationarity, and correlation stats from processed CSVs."""
+    dp = 'data/processed'
+    tr = pd.read_csv(os.path.join(dp, 'train.csv'), index_col=0, parse_dates=True)
+    va = pd.read_csv(os.path.join(dp, 'val.csv'), index_col=0, parse_dates=True)
+    te = pd.read_csv(os.path.join(dp, 'test.csv'), index_col=0, parse_dates=True)
+    st = pd.read_csv(os.path.join(dp, 'stress.csv'), index_col=0, parse_dates=True)
+    full = pd.read_csv(os.path.join(dp, 'chennai_clean_full.csv'), index_col=0, parse_dates=True)
+
+    stats = {
+        'n_anom': int(full['anomaly_removed'].sum()),
+        'tr_mean': tr['AQI'].mean(), 'va_mean': va['AQI'].mean(),
+        'te_mean': te['AQI'].mean(), 'st_mean': st['AQI'].mean(),
+        'tr_max': tr['AQI'].max(),
+        'tr_skew': tr['AQI'].skew(), 'tr_kurt': tr['AQI'].kurt(),
+        'pm_skew': tr['PM2.5'].skew(), 'pm_kurt': tr['PM2.5'].kurt(),
+    }
+
+    yr_sub = full.loc['2016-01-01':'2019-12-31'].groupby(full.loc['2016-01-01':'2019-12-31'].index.year)['AQI'].agg(['mean', 'std']).round(2)
+    slope = float(np.polyfit(np.array(yr_sub.index), yr_sub['mean'].values, 1)[0])
+    stats.update({
+        'slope': slope,
+        'y16_m': yr_sub.loc[2016, 'mean'], 'y16_s': yr_sub.loc[2016, 'std'],
+        'y17_m': yr_sub.loc[2017, 'mean'], 'y18_m': yr_sub.loc[2018, 'mean'],
+        'y18_s': yr_sub.loc[2018, 'std'], 'y19_m': yr_sub.loc[2019, 'mean'],
+        'y19_s': yr_sub.loc[2019, 'std'],
+    })
+
+    hist = full.loc['2016-01-01':'2019-12-31'].copy()
+    hist['Season'] = hist.index.month.map(lambda m: 'Winter' if m in [12, 1, 2] else ('SW' if m in [6, 7, 8, 9] else 'Other'))
+    hist['DOW'] = hist.index.strftime('%a')
+    ss = hist.groupby('Season')['AQI'].agg(['mean', 'std'])
+    dm = hist.groupby('DOW')['AQI'].mean()
+    stats.update({
+        'wint_m': ss.loc['Winter', 'mean'], 'wint_s': ss.loc['Winter', 'std'],
+        'sw_m': ss.loc['SW', 'mean'], 'sw_s': ss.loc['SW', 'std'],
+        'mon_m': dm['Mon'], 'wed_m': dm['Wed'], 'sun_m': dm['Sun'],
+        'dow_std': dm.std(),
+    })
+
+    def _cat(v):
+        if v <= 50: return 'Good'
+        if v <= 100: return 'Satisfactory'
+        if v <= 200: return 'Moderate'
+        if v <= 300: return 'Poor'
+        if v <= 400: return 'Very Poor'
+        return 'Severe'
+    cats = ['Good', 'Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']
+    pcts = pd.DataFrame({k: (df_s['AQI'].apply(_cat).value_counts().reindex(cats, fill_value=0) / len(df_s) * 100).round(2)
+                         for k, df_s in [('tr', tr), ('va', va), ('te', te), ('st', st)]})
+    for c in cats:
+        stats[f'cat_{c}_min'] = pcts.loc[c].min()
+        stats[f'cat_{c}_max'] = pcts.loc[c].max()
+
+    corr_p = tr[['AQI', 'PM2.5', 'CO', 'O3', 'NO2', 'SO2']].corr(method='pearson')
+    corr_s = tr[['AQI', 'PM2.5', 'CO', 'O3', 'NO2', 'SO2']].corr(method='spearman')
+    t1 = tr['AQI'].shift(-1)
+    stats.update({
+        'pm_r': corr_p.loc['AQI', 'PM2.5'], 'pm_rho': corr_s.loc['AQI', 'PM2.5'],
+        'o3_r': corr_p.loc['AQI', 'O3'], 'co_r': corr_p.loc['AQI', 'CO'],
+        'lag0_aqi': tr['AQI'].corr(t1), 'lag0_pm25': tr['PM2.5'].corr(t1),
+        'lag3_pm25': tr['PM2.5'].shift(3).corr(t1),
+        'lag0_no2': tr['NO2'].corr(t1), 'lag0_so2': tr['SO2'].corr(t1),
+    })
+
+    stl_a = STL(tr['AQI'], period=365, robust=True).fit()
+    stl_w = STL(tr['AQI'], period=7, robust=True).fit()
+    stats['fs_annual'] = max(0.0, 1.0 - float(np.var(stl_a.resid) / np.var(stl_a.seasonal + stl_a.resid)))
+    stats['fs_weekly'] = max(0.0, 1.0 - float(np.var(stl_w.resid) / np.var(stl_w.seasonal + stl_w.resid)))
+    stats['stl_q10'] = float(stl_a.seasonal.quantile(0.10))
+    stats['stl_q90'] = float(stl_a.seasonal.quantile(0.90))
+
+    adf_r = adfuller(tr['AQI'])
+    kpss_r = kpss(tr['AQI'], regression='c', nlags='auto')
+    adf_d = adfuller(tr['AQI'].diff().dropna())
+    kpss_d = kpss(tr['AQI'].diff().dropna(), regression='c', nlags='auto')
+    stats.update({
+        'adf_raw_p': adf_r[1], 'kpss_raw_stat': kpss_r[0], 'kpss_raw_p': kpss_r[1],
+        'adf_d1_p': adf_d[1], 'kpss_d1_stat': kpss_d[0], 'kpss_d1_p': kpss_d[1],
+    })
+
+    acf_400 = acf(tr['AQI'], nlags=400)
+    pacf_raw = pacf(tr['AQI'], nlags=5)
+    d_acf = acf(tr['AQI'].diff().dropna(), nlags=5)
+    stats.update({
+        'pacf1': pacf_raw[1], 'pacf2': pacf_raw[2],
+        'acf365': acf_400[365], 'bartlett': 1.96 / np.sqrt(len(tr)),
+        'd_acf1': d_acf[1], 'd_acf2': d_acf[2],
+    })
+
+    pre = pd.concat([full.loc['2018-03-01':'2018-06-30'], full.loc['2019-03-01':'2019-06-30']])
+    lock = full.loc['2020-03-01':'2020-06-30']
+    for col in ['AQI', 'PM2.5', 'CO', 'O3', 'NO2', 'SO2']:
+        stats[f'pct_{col.replace(".", "")}'] = ((lock[col].mean() - pre[col].mean()) / pre[col].mean()) * 100.0
+    return stats
+
+
 def create_phase4_notebook():
+    eda = _compute_eda_markdown_stats()
     nb = nbf.v4.new_notebook()
     nb["metadata"] = {
         "kernelspec": {
@@ -38,12 +140,12 @@ def create_phase4_notebook():
     # Title & Objective Cell
     # =========================================================================
     cells.append(
-        nbf.v4.new_markdown_cell("""# UCS321 Engineering Design / EST: Indian Oil Corporation AQI Forecasting
+        nbf.v4.new_markdown_cell(f"""# UCS321 Engineering Design / EST: Indian Oil Corporation AQI Forecasting
 ## Phase 4: Exploratory Data Analysis & Visualization (Corrected)
 
 **Course:** UCS321 (EST / Engineering Design)  
 **Project Objective:** Forecasting the Air Quality Index (AQI) around the CPCL Manali refinery corridor in Chennai using ARIMA and LSTM architectures to support proactive emission control.  
-**Phase Scope:** 10-section exploratory and diagnostic investigation on the cleaned series (incorporating the 19–22 Sep 2016 sensor anomaly removal) to extract empirical properties governing classical time series (ARIMA/SARIMAX) and deep learning (LSTM) models.
+**Phase Scope:** 10-section exploratory and diagnostic investigation on the cleaned series (incorporating the {eda['n_anom']} Aug–Sep 2016 sensor anomaly removals) to extract empirical properties governing classical time series (ARIMA/SARIMAX) and deep learning (LSTM) models.
 
 ---
 ### Strict Statistical & Modeling Rules Applied:
@@ -150,8 +252,8 @@ display(stats_df)""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 1):**  
-> Mean AQI shows a steady progression across partitions: $114.07$ in Train, $103.42$ in Validation, $95.73$ in Test, and $78.81$ during the Stress-Test lockdown. Following removal of the 19–22 Sep 2016 CO sensor anomaly, the maximum Train AQI is now $431.00$ (Diwali 2017) instead of $449.00$. Train AQI continues to exhibit positive skewness ($1.89$) and elevated kurtosis ($5.69$), while $\\text{PM}_{2.5}$ shows skewness of $1.77$ and kurtosis of $6.51$. This positive asymmetry reflects episodic pollution peaks, indicating that neural network loss functions should evaluate robust metrics (e.g. Huber loss) alongside MSE.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 1):**  
+> Mean AQI shows a steady progression across partitions: ${eda['tr_mean']:.2f}$ in Train, ${eda['va_mean']:.2f}$ in Validation, ${eda['te_mean']:.2f}$ in Test, and ${eda['st_mean']:.2f}$ during the Stress-Test lockdown. Following removal of the {eda['n_anom']} August–September 2016 CO sensor anomaly days, the maximum Train AQI is ${eda['tr_max']:.2f}$ (Diwali 2017) instead of $449.00$. Train AQI continues to exhibit positive skewness (${eda['tr_skew']:.2f}$) and elevated kurtosis (${eda['tr_kurt']:.2f}$), while $\\text{{PM}}_{{2.5}}$ shows skewness of ${eda['pm_skew']:.2f}$ and kurtosis of ${eda['pm_kurt']:.2f}$. This positive asymmetry reflects episodic pollution peaks, indicating that neural network loss functions should evaluate robust metrics (e.g. Huber loss) alongside MSE.""")
     )
 
     # =========================================================================
@@ -219,8 +321,8 @@ plt.show()""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 2):**  
-> Annual mean AQI declined at an average rate of $-8.66$ AQI points per year from 2016 to 2019. The annual summary table indicates that calendar year 2016 was substantially higher in mean ($132.18$) and notably more volatile (standard deviation $48.69$) than subsequent years ($104.34$ in 2017, $105.49$ in 2018 with std $40.34$, and $102.94$ in 2019 with std $41.67$). This heightened 2016 volatility justifies conducting training-window sensitivity tests in Phase 5 to evaluate whether omitting 2016 improves out-of-sample forecast accuracy.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 2):**  
+> Annual mean AQI declined at an average OLS rate of ${eda['slope']:.2f}$ AQI points per year ($-7.616$ unrounded) from 2016 to 2019. The annual summary table indicates that calendar year 2016 was substantially higher in mean (${eda['y16_m']:.2f}$) than subsequent years (${eda['y17_m']:.2f}$ in 2017, ${eda['y18_m']:.2f}$ in 2018 with std ${eda['y18_s']:.2f}$, and ${eda['y19_m']:.2f}$ in 2019 with std ${eda['y19_s']:.2f}$; std in 2016 was ${eda['y16_s']:.2f}$). This 2016 level shift justifies conducting training-window sensitivity tests in Phase 5 to evaluate whether omitting 2016 improves out-of-sample forecast accuracy.""")
     )
 
     # =========================================================================
@@ -295,8 +397,8 @@ print('\\nDay-of-Week Means:\\n', dow_summary)""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 3):**  
-> Ambient AQI exhibits clear seasonal variation: Winter records the highest mean AQI ($125.72 \\pm 47.77$), while the SW Monsoon records the lowest annual levels ($99.30 \\pm 42.61$). In contrast, day-of-week averages show virtually no difference across days (ranging from $105.77$ on Monday to $114.73$ on Wednesday, with Sunday at $111.08$; cross-day std $\\approx 2.9$). This indicates the absence of an empirical 'weekend effect' in daily ambient AQI, confirming that weekly seasonal differencing ($s=7$) is unnecessary in SARIMA.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 3):**  
+> Ambient AQI exhibits clear seasonal variation across 2016–2019: Winter (Dec–Feb) records the highest mean AQI (${eda['wint_m']:.2f} \\pm {eda['wint_s']:.2f}$), while the SW Monsoon (Jun–Sep) records the lowest annual levels (${eda['sw_m']:.2f} \\pm {eda['sw_s']:.2f}$). In contrast, day-of-week averages show minimal difference across days (ranging from ${eda['mon_m']:.2f}$ on Monday to ${eda['wed_m']:.2f}$ on Wednesday, with Sunday at ${eda['sun_m']:.2f}$; cross-day std $\\approx {eda['dow_std']:.2f}$). This indicates the absence of a pronounced 'weekend effect' in daily ambient AQI, consistent with omitting weekly seasonal differencing ($s=7$) in SARIMA.""")
     )
 
     # =========================================================================
@@ -360,8 +462,8 @@ plt.show()""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 4):**  
-> The distribution exhibits pronounced class imbalance: across all partitions, 'Satisfactory' ($49.8–84.4\\%$) and 'Moderate' ($14.8–44.1\\%$) comprise $>93\\%$ of all days. In contrast, 'Good' ($0.5–1.6\\%$), 'Poor' ($0.0–5.0\\%$), 'Very Poor' ($0.0–0.5\\%$), and 'Severe' ($0.0–0.1\\%$, $1$ day total) are rare episodic events. Consequently, relying on raw classification accuracy in Phase 5 and Phase 6 would produce a misleadingly high metric masked by the majority classes. Category-based evaluation must report Macro-Averaged F1-score and Cohen's Quadratic Weighted Kappa to penalize classification errors across health tiers.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 4):**  
+> The distribution exhibits pronounced class imbalance: across all partitions, 'Satisfactory' (${eda['cat_Satisfactory_min']:.2f}–{eda['cat_Satisfactory_max']:.2f}\\%$) and 'Moderate' (${eda['cat_Moderate_min']:.2f}–{eda['cat_Moderate_max']:.2f}\\%$) comprise $>92\\%$ of all days. In contrast, 'Good' (${eda['cat_Good_min']:.2f}–{eda['cat_Good_max']:.2f}\\%$), 'Poor' (${eda['cat_Poor_min']:.2f}–{eda['cat_Poor_max']:.2f}\\%$), 'Very Poor' (${eda['cat_Very Poor_min']:.2f}–{eda['cat_Very Poor_max']:.2f}\\%$), and 'Severe' (${eda['cat_Severe_min']:.2f}–{eda['cat_Severe_max']:.2f}\\%$, $1$ day total) are rare episodic events. Consequently, relying on raw classification accuracy in Phase 5 and Phase 6 would produce a misleadingly high metric masked by the majority classes. Category-based evaluation must report Macro-Averaged F1-score and Cohen's Quadratic Weighted Kappa to penalize classification errors across health tiers.""")
     )
 
     # =========================================================================
@@ -428,8 +530,8 @@ plt.show()""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 5):**  
-> $\\text{PM}_{2.5}$ is the strongest predictive criteria pollutant for AQI, exhibiting moderate-to-strong linear correlation ($r = 0.655$) and rank correlation ($\\rho = 0.704$), followed by $\\text{CO}$ ($r = 0.380$) and $\\text{O}_3$ ($r = 0.246$). In lagged correlations against next-day $\\text{AQI}(t+1)$, current target $\\text{AQI}(t)$ ($r = 0.672$) and $\\text{PM}_{2.5}(t)$ ($r = 0.606$) carry the highest predictive information, remaining positive through lag 3 ($r > 0.23$). Conversely, $\\text{NO}_2$ and $\\text{SO}_2$ exhibit near-zero linear cross-correlations with next-day AQI ($|r| < 0.06$). This supports incorporating lagged $\\text{PM}_{2.5}(t-1)$ in ARIMAX and prioritizing $\\text{AQI}$ and $\\text{PM}_{2.5}$ in multivariate LSTM.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 5):**  
+> $\\text{{PM}}_{{2.5}}$ is the strongest predictive criteria pollutant for AQI, exhibiting strong contemporaneous linear correlation ($r = {eda['pm_r']:.3f}$) and rank correlation ($\\rho = {eda['pm_rho']:.3f}$), followed by $\\text{{O}}_3$ ($r = {eda['o3_r']:.3f}$) and $\\text{{CO}}$ ($r = {eda['co_r']:.3f}$). In lagged correlations against next-day $\\text{{AQI}}(t+1)$, $\\text{{PM}}_{{2.5}}(t)$ ($r = {eda['lag0_pm25']:.3f}$) and current target $\\text{{AQI}}(t)$ ($r = {eda['lag0_aqi']:.3f}$) carry the highest predictive information, remaining positive through lag 3 ($\\text{{PM}}_{{2.5}}$ $r = {eda['lag3_pm25']:.3f}$). Conversely, $\\text{{NO}}_2$ ($r = {eda['lag0_no2']:.3f}$) and $\\text{{SO}}_2$ ($r = {eda['lag0_so2']:.3f}$) exhibit near-zero linear cross-correlations with next-day AQI. This supports incorporating lagged $\\text{{PM}}_{{2.5}}(t-1)$ in ARIMAX and prioritizing $\\text{{AQI}}$ and $\\text{{PM}}_{{2.5}}$ in multivariate LSTM.""")
     )
 
     # =========================================================================
@@ -506,8 +608,8 @@ plt.show()""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 6):**  
-> With the 19–22 Sep 2016 sensor anomaly removed, the top peak across the series is Diwali 2017 ($431.00$), followed by $370.00$ on 28 Oct 2016, and Bhogi on 13 Jan 2017 ($360.00$). Most top spikes coincide with high particulate loadings ($\\text{PM}_{2.5} > 130~\\mu\\text{g/m}^3$). A key data limitation is that $\\text{PM}_{10}$ was unmonitored ($87.86\\%$ missing); hence, overall AQI sub-indices reflect $\\text{PM}_{2.5}$ and available gaseous concentrations rather than combined coarse/fine particulate mass.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 6):**  
+> With the {eda['n_anom']} August–September 2016 sensor anomaly days removed, the top peak across the series is Diwali 2017 (${eda['tr_max']:.2f}$), followed by $370.00$ on 28 Oct 2016, and Bhogi on 13 Jan 2017 ($360.00$). Most top spikes coincide with high particulate loadings ($\\text{{PM}}_{{2.5}} > 130~\\mu\\text{{g/m}}^3$). A key data limitation is that $\\text{{PM}}_{{10}}$ was unmonitored ($87.86\\%$ missing); hence, overall AQI sub-indices reflect $\\text{{PM}}_{{2.5}}$ and available gaseous concentrations rather than combined coarse/fine particulate mass.""")
     )
 
     # =========================================================================
@@ -570,8 +672,8 @@ plt.show()""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 7):**  
-> STL decomposition confirms substantial annual seasonal strength ($F_s = 0.5520$), with a recurring seasonal curve spanning $\\approx \\pm 25$ AQI units between summer troughs and winter crests. In contrast, weekly seasonal strength is effectively zero ($F_s = 0.0000$), demonstrating that weekly cyclical components add no explanatory value in daily forecasting.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 7):**  
+> STL decomposition shows substantial annual seasonal strength ($F_s = {eda['fs_annual']:.4f}$), with the extracted annual seasonal component spanning ${eda['stl_q10']:.1f}$ to $+{eda['stl_q90']:.1f}$ AQI units across the central 10th–90th percentile range between monsoon troughs and winter peaks. In contrast, weekly seasonal strength is near zero ($F_s = {eda['fs_weekly']:.4f}$), indicating that weekly cyclical components add negligible explanatory value in daily forecasting.""")
     )
 
     # =========================================================================
@@ -633,8 +735,8 @@ display(stat_test_df)""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 8):**  
-> On raw AQI, ADF rejects a unit root ($p = 1.17 \\times 10^{-6}$), yet KPSS rejects level stationarity ($1.298 > 0.463$, $p = 0.01$) due to persistent seasonal variation and secular baseline shifts. Differencing once ($d=1$) yields stationarity per both ADF ($p = 5.77 \\times 10^{-24}$) and KPSS ($p = 0.10$). While log transformation produces comparable results, it introduces exponentiation re-transformation bias without clear variance benefits. However, because ADF strongly rejects a unit root on raw AQI and differencing risks introducing over-differencing (as investigated in Section 9), models with $d=0$ (incorporating seasonal Fourier regressors) remain serious candidates alongside $d=1$.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 8):**  
+> On raw AQI, ADF rejects a unit root ($p = {eda['adf_raw_p']:.2e}$), yet KPSS rejects level stationarity (${eda['kpss_raw_stat']:.4f} > 0.463$, $p = {eda['kpss_raw_p']:.2f}$) due to persistent seasonal variation and secular baseline shifts. Differencing once ($d=1$) yields stationarity per both ADF ($p = {eda['adf_d1_p']:.2e}$) and KPSS (${eda['kpss_d1_stat']:.4f} < 0.463$, $p = {eda['kpss_d1_p']:.2f}$). While log transformation produces comparable results, it introduces exponentiation re-transformation bias without clear variance benefits. However, because ADF strongly rejects a unit root on raw AQI and differencing risks introducing over-differencing (as investigated in Section 9), models with $d=0$ (incorporating seasonal Fourier regressors) remain serious candidates alongside $d=1$.""")
     )
 
     # =========================================================================
@@ -708,9 +810,9 @@ print(f"Differenced PACF (lags 1-9): {[round(x, 3) for x in diff_pacf_vals[1:10]
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 9):**  
-> On raw AQI, the ACF exhibits geometric decay while the PACF cuts off sharply after lag 1 (lag 1 PACF $= 0.672$, lag 2 $= 0.007$, inside Bartlett bounds), diagnosing an underlying $\\text{AR}(1)$ foundation. In long-lag ACF, the exact autocorrelation at lag $365$ is **$r = 0.0618$**, which lies directly at the edge of the 95% Bartlett confidence band ($\\pm 0.0592$). This confirms that while annual seasonality is prominent in STL decomposition and monthly means, it produces only weak linear autocorrelation in the daily ACF.  
-> Furthermore, on the first-differenced series, the differenced ACF has negative spikes at lags 1 and 2 ($-0.171, -0.149$), and the differenced PACF shows prolonged negative coefficients across lags 1 through 9. This is a classic signature of **over-differencing**. Because ADF strongly rejects a unit root on raw AQI ($p = 1.17 \\times 10^{-6}$), **$d=0$ (with constant and yearly Fourier terms) is a serious candidate** alongside $d=1$. Both $d=0$ and $d=1$ will be tested systematically in Phase 5.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 9):**  
+> On raw AQI, the ACF exhibits geometric decay while the PACF cuts off sharply after lag 1 (lag 1 PACF $= {eda['pacf1']:.3f}$, lag 2 $= {eda['pacf2']:.3f}$, inside Bartlett bounds), diagnosing an underlying $\\text{{AR}}(1)$ foundation. In long-lag ACF, the exact autocorrelation at lag $365$ is **$r = {eda['acf365']:.4f}$**, which lies just above the 95% Bartlett confidence band ($\\pm {eda['bartlett']:.4f}$). This indicates that while annual seasonality is prominent in STL decomposition and monthly means, it produces only modest linear autocorrelation in the daily ACF.  
+> Furthermore, on the first-differenced series, the differenced ACF has negative spikes at lags 1 and 2 (${eda['d_acf1']:.3f}, {eda['d_acf2']:.3f}$), and the differenced PACF shows prolonged negative coefficients across lags 1 through 9. This is a classic signature of **over-differencing**. Because ADF strongly rejects a unit root on raw AQI ($p = {eda['adf_raw_p']:.2e}$), **$d=0$ (with constant and yearly Fourier terms) is a serious candidate** alongside $d=1$. Both $d=0$ and $d=1$ will be tested systematically in Phase 5.""")
     )
 
     # =========================================================================
@@ -784,24 +886,24 @@ plt.show()""")
     )
 
     cells.append(
-        nbf.v4.new_markdown_cell("""> **Observation (Section 10):**  
-> During the 2020 lockdown window, substantial drops occurred across primary combustion pollutants: $\\text{NO}_2$ dropped by $-52.24\\%$, $\\text{PM}_{2.5}$ dropped by $-46.56\\%$, $\\text{SO}_2$ by $-12.69\\%$, $\\text{CO}$ by $-11.96\\%$, and overall AQI fell by $-17.40\\%$. In contrast, surface Ozone ($\\text{O}_3$) surged by $+42.11\\%$. This behavior is consistent with the urban VOC-limited regime, where reducing NO emissions slows the chemical titration of ozone ($\\text{NO} + \\text{O}_3 \\rightarrow \\text{NO}_2 + \\text{O}_2$), allowing secondary ozone to accumulate under strong solar radiation. This structural regime shift confirms the necessity of isolating March–June 2020 as a stress-test window rather than including it in model training.""")
+        nbf.v4.new_markdown_cell(f"""> **Observation (Section 10):**  
+> During the 2020 lockdown window, substantial drops occurred across primary combustion pollutants: $\\text{{NO}}_2$ dropped by ${eda['pct_NO2']:+.2f}\\%$, $\\text{{PM}}_{{2.5}}$ dropped by ${eda['pct_PM25']:+.2f}\\%$, $\\text{{SO}}_2$ by ${eda['pct_SO2']:+.2f}\\%$, $\\text{{CO}}$ by ${eda['pct_CO']:+.2f}\\%$, and overall AQI fell by ${eda['pct_AQI']:+.2f}\\%$. In contrast, surface Ozone ($\\text{{O}}_3$) surged by ${eda['pct_O3']:+.2f}\\%$. This behavior is consistent with the urban VOC-limited regime, where reducing NO emissions slows the chemical titration of ozone ($\\text{{NO}} + \\text{{O}}_3 \\rightarrow \\text{{NO}}_2 + \\text{{O}}_2$), allowing secondary ozone to accumulate under strong solar radiation. This structural regime shift supports isolating March–June 2020 as a stress-test window rather than including it in model training.""")
     )
 
     # =========================================================================
     # Section 11: Final Synthesis
     # =========================================================================
     cells.append(
-        nbf.v4.new_markdown_cell("""## 11. Final Synthesis & Modeling Architecture Roadmap
+        nbf.v4.new_markdown_cell(f"""## 11. Final Synthesis & Modeling Architecture Roadmap
 
 | Modeling Dimension | Empirical Finding (Phase 4 Corrected) | Direct Architectural Decision (Phase 5 & Phase 6) |
 | :--- | :--- | :--- |
-| **Differencing Order ($d$)** | ADF rejects unit root on raw AQI ($p = 1.17 \\times 10^{-6}$); differenced series shows over-differencing signature (negative ACF lags 1–2, negative PACF lags 1–9). | Test both **$d=0$ (with Fourier terms and constant)** and **$d=1$** in Phase 5 grid search. |
-| **ARIMA Orders $(p, d, q)$** | Sharp lag-1 cutoff in raw PACF; negative lag-1/lag-2 ACF spikes in differenced series. | Grid-search candidate set: **$\\text{ARIMA}(p, d, q)$** for $p, q \\in \\{0, 1, 2, 3\\}$. |
-| **Seasonality Handling** | Weekly seasonality is negligible ($F_s = 0.0000$); annual seasonality is prominent in STL ($F_s = 0.5520$) but weak in raw ACF ($r = 0.0618$ at lag 365, near Bartlett band $\\pm 0.0592$). | Standard SARIMA with $m=365$ is state-space intractable. Use **deterministic harmonic Fourier terms** ($K \\in \\{1, 2, 3\\}$) as exogenous regressors in ARIMAX. |
-| **Training-Window Sensitivity** | 2016 exhibits notably higher mean ($132.18$) and higher standard deviation ($48.69$) than 2017–2019. | Evaluate final model sensitivity fitted on **2016–2018** vs **2017–2018** training windows. |
-| **Predictive Features** | $\\text{PM}_{2.5}$ has strongest cross-correlation with $\\text{AQI}(t+1)$ ($r = 0.606$). | Test $\\text{ARIMAX}$ with lagged $\\text{PM}_{2.5}(t-1)$ as an exogenous regressor for 1-day horizon. |
-| **Evaluation Metrics** | Severe class imbalance ($>93\\%$ in Satisfactory/Moderate). | Report **Macro-F1** and **Cohen's Quadratic Weighted Kappa** in addition to RMSE, MAE, and MAPE. |""")
+| **Differencing Order ($d$)** | ADF rejects unit root on raw AQI ($p = {eda['adf_raw_p']:.2e}$); differenced series shows over-differencing signature (negative ACF lags 1–2, negative PACF lags 1–9). | Test both **$d=0$ (with Fourier terms and constant)** and **$d=1$** in Phase 5 grid search. |
+| **ARIMA Orders $(p, d, q)$** | Sharp lag-1 cutoff in raw PACF ($0.678$); negative lag-1/lag-2 ACF spikes in differenced series. | Grid-search candidate set: **$\\text{{ARIMA}}(p, d, q)$** for $p, q \\in \\{{0, 1, 2, 3\\}}$. |
+| **Seasonality Handling** | Weekly seasonality is negligible ($F_s = {eda['fs_weekly']:.4f}$); annual seasonality is prominent in STL ($F_s = {eda['fs_annual']:.4f}$) and modest in raw ACF ($r = {eda['acf365']:.4f}$ at lag 365 vs Bartlett band $\\pm {eda['bartlett']:.4f}$). | Standard SARIMA with $m=365$ is state-space intractable. Use **deterministic harmonic Fourier terms** ($K \\in \\{{1, 2, 3\\}}$) as exogenous regressors in ARIMAX. |
+| **Training-Window Sensitivity** | 2016 exhibits notably higher mean (${eda['y16_m']:.2f}$) and higher standard deviation (${eda['y16_s']:.2f}$) than 2017–2019. | Evaluate final model sensitivity fitted on **2016–2018** vs **2017–2018** training windows. |
+| **Predictive Features** | $\\text{{PM}}_{{2.5}}$ has strongest cross-correlation with $\\text{{AQI}}(t+1)$ ($r = {eda['lag0_pm25']:.3f}$). | Test $\\text{{ARIMAX}}$ with lagged $\\text{{PM}}_{{2.5}}(t-1)$ as an exogenous regressor for 1-day horizon. |
+| **Evaluation Metrics** | Severe class imbalance ($>92\\%$ in Satisfactory/Moderate). | Report **Macro-F1** and **Cohen's Quadratic Weighted Kappa** in addition to RMSE, MAE, and MAPE. |""")
     )
 
     nb["cells"] = cells

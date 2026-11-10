@@ -686,8 +686,8 @@ else:
     cells.append(
         nbf.v4.new_markdown_cell("""## 8. Summary of Findings & Next Steps
 - **Selected Target Series:** Chennai City-Level series (`city_day.csv`). Manali station `TN003` was disqualified due to $31.28\%$ missingness and a 411-day gap; Station `TN002` was disqualified due to insufficient historical length (256 days).
-- **Chronological Split:** Train ($1,461$ days, 2015–2018), Validation ($243$ days, Jan–Aug 2019, 0% missing), Test ($182$ days, Sep 2019 – Feb 2020, 0% missing), and Stress-Test ($122$ days, Mar–Jun 2020, 0% missing).
-- **COVID-19 Impact:** During lockdown (25 Mar – 31 May 2020), Chennai AQI dropped by $26.32\%$ compared to 2019, confirming the decision to segregate this window.
+- **Chronological Split:** Initially proposed Train ($1,461$ days, 2015–2018; locked in Phase 3 to $1,096$ days, 2016–2018 after excluding the 82-day 2015 outage), Validation ($243$ days, Jan–Aug 2019, 0% missing), Test ($182$ days, Sep 2019 – Feb 2020, 0% missing), and Stress-Test ($122$ days, Mar–Jun 2020, 0% missing).
+- **COVID-19 Impact:** During lockdown (25 Mar – 31 May 2020), Chennai AQI dropped by $26.32\%$ compared to 2019, consistent with segregating this window.
 - **Multivariate Features:** 10 pollutants selected for Phase 3 imputation and feature engineering (`PM2.5`, `NO`, `NO2`, `NOx`, `NH3`, `CO`, `SO2`, `O3`, `Benzene`, `Toluene`). `PM10` and `Xylene` were excluded due to excessive missingness.
 
 This notebook concludes Phase 2. Proceed to **Phase 3: Preprocessing & Imputation** (`notebooks/03_preprocessing.ipynb`).""")

@@ -320,7 +320,7 @@ plt.show()
    - In Classical modeling, adding PM2.5 reduced RMSE from 30.58 to 25.97 (-15.1%).
    - In Deep Learning, adding multivariate features reduced RMSE from 31.73 to 27.63 (-12.9%).
 4. **All Models Exhibit Systematic Under-Prediction on Extreme Spikes**:
-   - On the top 10% highest AQI days (AQI $\\ge 134.9$, $N=19$), every model showed negative bias ($\\bar{e} \\in [-35.7, -55.5]$ AQI).
+   - On the top 10% highest AQI days (AQI $\\ge 134.9$, $N=19$), every model showed negative bias ($\\bar{e} \\in [-27.6, -55.5]$ AQI).
    - In an audit of the top 5 worst-forecast days for each model, **2 of the 5 worst days correspond to calendar-verified festival events** (Diwali on 2019-10-27, actual AQI 306.0, and Bhogi on 2020-01-14, actual AQI 230.0). The remaining 3 days carry "No matched event".
 5. **COVID Lockdown Stress Window Metrics & Mean Forecast Bias**:
    - Pure ARIMA achieved the lowest stress RMSE (13.51), followed by persistence (14.45); models using exogenous or seasonal terms (ARIMAX 17.74, multivariate CNN-LSTM 20.28) performed worst, with the LSTMs over-predicting (mean bias +7.84 / +10.55) and ARIMAX under-predicting (−8.32).
