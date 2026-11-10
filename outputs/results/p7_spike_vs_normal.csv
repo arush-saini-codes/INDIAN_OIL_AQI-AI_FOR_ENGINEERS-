@@ -1,0 +1,6 @@
+model,normal_count,normal_RMSE,normal_MAE,normal_Bias,spike_count,spike_RMSE,spike_MAE,spike_Bias
+Persistence,163,23.53,15.01,3.52,19,71.56,58.53,-27.58
+Pure ARIMA,163,19.9,14.6,6.98,19,74.57,58.93,-55.54
+ARIMAX,163,18.78,14.97,9.56,19,58.58,48.24,-36.83
+LSTM (multivariate),163,21.07,17.97,14.57,19,59.22,49.05,-39.09
+Hybrid,163,20.35,16.72,13.12,19,57.76,47.26,-35.74

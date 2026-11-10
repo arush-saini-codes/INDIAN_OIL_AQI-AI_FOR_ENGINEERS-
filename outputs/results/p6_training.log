@@ -1,0 +1,178 @@
+[2026-11-07 19:05:08] Ingesting clean datasets and fitted scalers...
+[2026-11-07 19:05:08] ====================================================================
+[2026-11-07 19:05:08] STARTING STAGE 1: Feature Set x Lookback Search (Baseline Stacked LSTM)
+[2026-11-07 19:05:08] ====================================================================
+[2026-11-07 19:05:18] [Stage 1 Done] fs=U, lb=7, seed=42 -> Val RMSE=29.87, Epoch=47, Time=9.6s
+[2026-11-07 19:05:33] [Stage 1 Done] fs=U, lb=7, seed=123 -> Val RMSE=29.59, Epoch=82, Time=14.1s
+[2026-11-07 19:05:40] [Stage 1 Done] fs=U, lb=7, seed=456 -> Val RMSE=30.16, Epoch=32, Time=7.4s
+[2026-11-07 19:05:56] [Stage 1 Done] fs=U, lb=7, seed=789 -> Val RMSE=29.52, Epoch=99, Time=14.8s
+[2026-11-07 19:06:06] [Stage 1 Done] fs=U, lb=7, seed=1011 -> Val RMSE=29.68, Epoch=56, Time=10.5s
+[2026-11-07 19:06:26] [Stage 1 Done] fs=U, lb=14, seed=42 -> Val RMSE=29.57, Epoch=97, Time=19.4s
+[2026-11-07 19:06:38] [Stage 1 Done] fs=U, lb=14, seed=123 -> Val RMSE=30.47, Epoch=36, Time=11.7s
+[2026-11-07 19:06:49] [Stage 1 Done] fs=U, lb=14, seed=456 -> Val RMSE=30.52, Epoch=32, Time=10.1s
+[2026-11-07 19:07:05] [Stage 1 Done] fs=U, lb=14, seed=789 -> Val RMSE=29.76, Epoch=65, Time=15.9s
+[2026-11-07 19:07:25] [Stage 1 Done] fs=U, lb=14, seed=1011 -> Val RMSE=29.61, Epoch=92, Time=19.9s
+[2026-11-07 19:07:47] [Stage 1 Done] fs=U, lb=30, seed=42 -> Val RMSE=29.89, Epoch=56, Time=22.0s
+[2026-11-07 19:08:18] [Stage 1 Done] fs=U, lb=30, seed=123 -> Val RMSE=29.61, Epoch=100, Time=30.0s
+[2026-11-07 19:08:43] [Stage 1 Done] fs=U, lb=30, seed=456 -> Val RMSE=29.77, Epoch=67, Time=25.0s
+[2026-11-07 19:09:17] [Stage 1 Done] fs=U, lb=30, seed=789 -> Val RMSE=29.63, Epoch=89, Time=33.3s
+[2026-11-07 19:09:37] [Stage 1 Done] fs=U, lb=30, seed=1011 -> Val RMSE=29.95, Epoch=45, Time=19.6s
+[2026-11-07 19:10:16] [Stage 1 Done] fs=U, lb=60, seed=42 -> Val RMSE=29.76, Epoch=58, Time=38.7s
+[2026-11-07 19:10:46] [Stage 1 Done] fs=U, lb=60, seed=123 -> Val RMSE=29.84, Epoch=41, Time=30.2s
+[2026-11-07 19:11:18] [Stage 1 Done] fs=U, lb=60, seed=456 -> Val RMSE=29.86, Epoch=44, Time=31.6s
+[2026-11-07 19:12:06] [Stage 1 Done] fs=U, lb=60, seed=789 -> Val RMSE=29.61, Epoch=72, Time=47.8s
+[2026-11-07 19:13:00] [Stage 1 Done] fs=U, lb=60, seed=1011 -> Val RMSE=29.94, Epoch=88, Time=53.8s
+[2026-11-07 19:13:07] [Stage 1 Done] fs=P, lb=7, seed=42 -> Val RMSE=28.27, Epoch=21, Time=5.9s
+[2026-11-07 19:13:13] [Stage 1 Done] fs=P, lb=7, seed=123 -> Val RMSE=27.81, Epoch=22, Time=6.0s
+[2026-11-07 19:13:21] [Stage 1 Done] fs=P, lb=7, seed=456 -> Val RMSE=28.46, Epoch=36, Time=7.8s
+[2026-11-07 19:13:27] [Stage 1 Done] fs=P, lb=7, seed=789 -> Val RMSE=28.30, Epoch=18, Time=5.9s
+[2026-11-07 19:13:33] [Stage 1 Done] fs=P, lb=7, seed=1011 -> Val RMSE=28.04, Epoch=18, Time=5.5s
+[2026-11-07 19:13:41] [Stage 1 Done] fs=P, lb=14, seed=42 -> Val RMSE=28.58, Epoch=21, Time=7.6s
+[2026-11-07 19:14:00] [Stage 1 Done] fs=P, lb=14, seed=123 -> Val RMSE=27.29, Epoch=97, Time=18.8s
+[2026-11-07 19:14:08] [Stage 1 Done] fs=P, lb=14, seed=456 -> Val RMSE=29.05, Epoch=20, Time=7.5s
+[2026-11-07 19:14:27] [Stage 1 Done] fs=P, lb=14, seed=789 -> Val RMSE=27.19, Epoch=99, Time=18.9s
+[2026-11-07 19:14:35] [Stage 1 Done] fs=P, lb=14, seed=1011 -> Val RMSE=28.42, Epoch=23, Time=7.9s
+[2026-11-07 19:14:48] [Stage 1 Done] fs=P, lb=30, seed=42 -> Val RMSE=28.43, Epoch=21, Time=12.2s
+[2026-11-07 19:15:00] [Stage 1 Done] fs=P, lb=30, seed=123 -> Val RMSE=28.57, Epoch=23, Time=12.2s
+[2026-11-07 19:15:12] [Stage 1 Done] fs=P, lb=30, seed=456 -> Val RMSE=29.27, Epoch=20, Time=11.5s
+[2026-11-07 19:15:25] [Stage 1 Done] fs=P, lb=30, seed=789 -> Val RMSE=28.97, Epoch=25, Time=12.8s
+[2026-11-07 19:15:56] [Stage 1 Done] fs=P, lb=30, seed=1011 -> Val RMSE=27.13, Epoch=95, Time=30.0s
+[2026-11-07 19:16:17] [Stage 1 Done] fs=P, lb=60, seed=42 -> Val RMSE=28.24, Epoch=22, Time=20.6s
+[2026-11-07 19:16:38] [Stage 1 Done] fs=P, lb=60, seed=123 -> Val RMSE=28.26, Epoch=23, Time=20.8s
+[2026-11-07 19:16:59] [Stage 1 Done] fs=P, lb=60, seed=456 -> Val RMSE=28.73, Epoch=21, Time=21.2s
+[2026-11-07 19:17:21] [Stage 1 Done] fs=P, lb=60, seed=789 -> Val RMSE=28.20, Epoch=22, Time=21.1s
+[2026-11-07 19:17:44] [Stage 1 Done] fs=P, lb=60, seed=1011 -> Val RMSE=29.07, Epoch=26, Time=22.8s
+[2026-11-07 19:17:50] [Stage 1 Done] fs=C, lb=7, seed=42 -> Val RMSE=27.96, Epoch=21, Time=5.9s
+[2026-11-07 19:17:56] [Stage 1 Done] fs=C, lb=7, seed=123 -> Val RMSE=27.40, Epoch=21, Time=5.9s
+[2026-11-07 19:18:08] [Stage 1 Done] fs=C, lb=7, seed=456 -> Val RMSE=27.04, Epoch=64, Time=11.3s
+[2026-11-07 19:18:22] [Stage 1 Done] fs=C, lb=7, seed=789 -> Val RMSE=26.71, Epoch=92, Time=14.1s
+[2026-11-07 19:18:28] [Stage 1 Done] fs=C, lb=7, seed=1011 -> Val RMSE=27.77, Epoch=18, Time=5.5s
+[2026-11-07 19:18:36] [Stage 1 Done] fs=C, lb=14, seed=42 -> Val RMSE=28.25, Epoch=21, Time=7.7s
+[2026-11-07 19:18:53] [Stage 1 Done] fs=C, lb=14, seed=123 -> Val RMSE=27.73, Epoch=65, Time=15.9s
+[2026-11-07 19:19:00] [Stage 1 Done] fs=C, lb=14, seed=456 -> Val RMSE=27.94, Epoch=20, Time=7.4s
+[2026-11-07 19:19:14] [Stage 1 Done] fs=C, lb=14, seed=789 -> Val RMSE=27.73, Epoch=53, Time=13.3s
+[2026-11-07 19:19:22] [Stage 1 Done] fs=C, lb=14, seed=1011 -> Val RMSE=27.90, Epoch=19, Time=7.2s
+[2026-11-07 19:19:34] [Stage 1 Done] fs=C, lb=30, seed=42 -> Val RMSE=27.90, Epoch=22, Time=11.8s
+[2026-11-07 19:19:48] [Stage 1 Done] fs=C, lb=30, seed=123 -> Val RMSE=28.04, Epoch=28, Time=13.5s
+[2026-11-07 19:20:00] [Stage 1 Done] fs=C, lb=30, seed=456 -> Val RMSE=28.18, Epoch=24, Time=12.3s
+[2026-11-07 19:20:12] [Stage 1 Done] fs=C, lb=30, seed=789 -> Val RMSE=28.28, Epoch=22, Time=11.9s
+[2026-11-07 19:20:35] [Stage 1 Done] fs=C, lb=30, seed=1011 -> Val RMSE=27.46, Epoch=61, Time=22.7s
+[2026-11-07 19:20:58] [Stage 1 Done] fs=C, lb=60, seed=42 -> Val RMSE=27.82, Epoch=24, Time=21.4s
+[2026-11-07 19:21:21] [Stage 1 Done] fs=C, lb=60, seed=123 -> Val RMSE=27.93, Epoch=25, Time=22.8s
+[2026-11-07 19:21:43] [Stage 1 Done] fs=C, lb=60, seed=456 -> Val RMSE=28.12, Epoch=23, Time=21.7s
+[2026-11-07 19:22:10] [Stage 1 Done] fs=C, lb=60, seed=789 -> Val RMSE=27.48, Epoch=34, Time=26.8s
+[2026-11-07 19:22:33] [Stage 1 Done] fs=C, lb=60, seed=1011 -> Val RMSE=28.27, Epoch=26, Time=22.6s
+[2026-11-07 19:22:39] [Stage 1 Done] fs=A, lb=7, seed=42 -> Val RMSE=27.92, Epoch=21, Time=5.8s
+[2026-11-07 19:22:46] [Stage 1 Done] fs=A, lb=7, seed=123 -> Val RMSE=28.03, Epoch=25, Time=6.3s
+[2026-11-07 19:22:52] [Stage 1 Done] fs=A, lb=7, seed=456 -> Val RMSE=28.73, Epoch=18, Time=5.5s
+[2026-11-07 19:22:58] [Stage 1 Done] fs=A, lb=7, seed=789 -> Val RMSE=28.21, Epoch=22, Time=6.0s
+[2026-11-07 19:23:04] [Stage 1 Done] fs=A, lb=7, seed=1011 -> Val RMSE=28.08, Epoch=19, Time=5.6s
+[2026-11-07 19:23:12] [Stage 1 Done] fs=A, lb=14, seed=42 -> Val RMSE=28.63, Epoch=22, Time=7.9s
+[2026-11-07 19:23:22] [Stage 1 Done] fs=A, lb=14, seed=123 -> Val RMSE=28.72, Epoch=31, Time=9.4s
+[2026-11-07 19:23:31] [Stage 1 Done] fs=A, lb=14, seed=456 -> Val RMSE=28.64, Epoch=23, Time=9.2s
+[2026-11-07 19:23:41] [Stage 1 Done] fs=A, lb=14, seed=789 -> Val RMSE=28.88, Epoch=29, Time=9.3s
+[2026-11-07 19:23:49] [Stage 1 Done] fs=A, lb=14, seed=1011 -> Val RMSE=28.35, Epoch=22, Time=8.0s
+[2026-11-07 19:24:04] [Stage 1 Done] fs=A, lb=30, seed=42 -> Val RMSE=28.60, Epoch=31, Time=14.6s
+[2026-11-07 19:24:18] [Stage 1 Done] fs=A, lb=30, seed=123 -> Val RMSE=28.71, Epoch=27, Time=13.3s
+[2026-11-07 19:24:31] [Stage 1 Done] fs=A, lb=30, seed=456 -> Val RMSE=29.34, Epoch=26, Time=13.0s
+[2026-11-07 19:24:46] [Stage 1 Done] fs=A, lb=30, seed=789 -> Val RMSE=29.24, Epoch=30, Time=14.2s
+[2026-11-07 19:25:03] [Stage 1 Done] fs=A, lb=30, seed=1011 -> Val RMSE=28.51, Epoch=39, Time=16.8s
+[2026-11-07 19:25:25] [Stage 1 Done] fs=A, lb=60, seed=42 -> Val RMSE=28.45, Epoch=24, Time=21.6s
+[2026-11-07 19:25:48] [Stage 1 Done] fs=A, lb=60, seed=123 -> Val RMSE=28.85, Epoch=26, Time=22.7s
+[2026-11-07 19:26:09] [Stage 1 Done] fs=A, lb=60, seed=456 -> Val RMSE=28.92, Epoch=23, Time=21.1s
+[2026-11-07 19:26:36] [Stage 1 Done] fs=A, lb=60, seed=789 -> Val RMSE=28.20, Epoch=34, Time=27.0s
+[2026-11-07 19:26:58] [Stage 1 Done] fs=A, lb=60, seed=1011 -> Val RMSE=29.48, Epoch=23, Time=21.3s
+[2026-11-07 19:26:58] Stage 1 Complete in 1309.6s. Top 2 configurations:
+  feature_set  lookback     mean       std
+0           C         7  27.3750  0.513283
+1           C        14  27.9058  0.212804
+[2026-11-07 19:26:58] ====================================================================
+[2026-11-07 19:26:58] STARTING STAGE 2: Architecture Comparison on Top 2 Configurations
+[2026-11-07 19:26:58] ====================================================================
+[2026-11-07 19:27:04] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=7, seed=42 -> Val RMSE=27.96, Time=6.0s
+[2026-11-07 19:27:12] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=7, seed=123 -> Val RMSE=27.40, Time=7.2s
+[2026-11-07 19:27:24] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=7, seed=456 -> Val RMSE=27.04, Time=11.7s
+[2026-11-07 19:27:39] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=7, seed=789 -> Val RMSE=26.71, Time=14.4s
+[2026-11-07 19:27:45] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=7, seed=1011 -> Val RMSE=27.77, Time=5.5s
+[2026-11-07 19:27:53] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=7, seed=42 -> Val RMSE=26.95, Time=7.8s
+[2026-11-07 19:27:58] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=7, seed=123 -> Val RMSE=26.65, Time=5.1s
+[2026-11-07 19:28:03] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=7, seed=456 -> Val RMSE=27.81, Time=4.8s
+[2026-11-07 19:28:09] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=7, seed=789 -> Val RMSE=27.41, Time=5.3s
+[2026-11-07 19:28:14] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=7, seed=1011 -> Val RMSE=27.21, Time=4.6s
+[2026-11-07 19:28:24] [Stage 2 Done] arch=BiLSTM, fs=C, lb=7, seed=42 -> Val RMSE=28.30, Time=9.9s
+[2026-11-07 19:28:41] [Stage 2 Done] arch=BiLSTM, fs=C, lb=7, seed=123 -> Val RMSE=26.77, Time=16.0s
+[2026-11-07 19:28:50] [Stage 2 Done] arch=BiLSTM, fs=C, lb=7, seed=456 -> Val RMSE=28.90, Time=8.9s
+[2026-11-07 19:29:08] [Stage 2 Done] arch=BiLSTM, fs=C, lb=7, seed=789 -> Val RMSE=25.86, Time=17.2s
+[2026-11-07 19:29:20] [Stage 2 Done] arch=BiLSTM, fs=C, lb=7, seed=1011 -> Val RMSE=27.30, Time=11.4s
+[2026-11-07 19:29:28] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=7, seed=42 -> Val RMSE=27.19, Time=7.8s
+[2026-11-07 19:29:39] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=7, seed=123 -> Val RMSE=24.73, Time=11.0s
+[2026-11-07 19:29:47] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=7, seed=456 -> Val RMSE=27.21, Time=8.0s
+[2026-11-07 19:29:58] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=7, seed=789 -> Val RMSE=25.77, Time=10.9s
+[2026-11-07 19:30:05] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=7, seed=1011 -> Val RMSE=26.30, Time=6.8s
+[2026-11-07 19:30:14] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=14, seed=42 -> Val RMSE=28.25, Time=8.0s
+[2026-11-07 19:30:29] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=14, seed=123 -> Val RMSE=27.73, Time=15.5s
+[2026-11-07 19:30:37] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=14, seed=456 -> Val RMSE=27.94, Time=7.6s
+[2026-11-07 19:30:51] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=14, seed=789 -> Val RMSE=27.73, Time=13.4s
+[2026-11-07 19:30:59] [Stage 2 Done] arch=Stacked_LSTM, fs=C, lb=14, seed=1011 -> Val RMSE=27.90, Time=7.3s
+[2026-11-07 19:31:07] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=14, seed=42 -> Val RMSE=27.32, Time=8.1s
+[2026-11-07 19:31:15] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=14, seed=123 -> Val RMSE=27.68, Time=7.4s
+[2026-11-07 19:31:32] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=14, seed=456 -> Val RMSE=26.80, Time=16.4s
+[2026-11-07 19:31:46] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=14, seed=789 -> Val RMSE=26.79, Time=13.7s
+[2026-11-07 19:31:53] [Stage 2 Done] arch=Stacked_GRU, fs=C, lb=14, seed=1011 -> Val RMSE=27.15, Time=6.8s
+[2026-11-07 19:32:03] [Stage 2 Done] arch=BiLSTM, fs=C, lb=14, seed=42 -> Val RMSE=29.17, Time=9.5s
+[2026-11-07 19:32:19] [Stage 2 Done] arch=BiLSTM, fs=C, lb=14, seed=123 -> Val RMSE=28.40, Time=15.2s
+[2026-11-07 19:32:32] [Stage 2 Done] arch=BiLSTM, fs=C, lb=14, seed=456 -> Val RMSE=28.95, Time=12.7s
+[2026-11-07 19:32:44] [Stage 2 Done] arch=BiLSTM, fs=C, lb=14, seed=789 -> Val RMSE=29.39, Time=11.1s
+[2026-11-07 19:32:56] [Stage 2 Done] arch=BiLSTM, fs=C, lb=14, seed=1011 -> Val RMSE=28.27, Time=11.8s
+[2026-11-07 19:33:05] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=14, seed=42 -> Val RMSE=27.61, Time=8.8s
+[2026-11-07 19:33:10] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=14, seed=123 -> Val RMSE=28.92, Time=4.6s
+[2026-11-07 19:33:14] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=14, seed=456 -> Val RMSE=27.02, Time=4.3s
+[2026-11-07 19:33:24] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=14, seed=789 -> Val RMSE=27.47, Time=9.4s
+[2026-11-07 19:33:29] [Stage 2 Done] arch=CNN_LSTM, fs=C, lb=14, seed=1011 -> Val RMSE=28.54, Time=5.2s
+[2026-11-07 19:33:29] Stage 2 Complete in 391.2s. Winning architecture:
+{'model_arch': 'CNN_LSTM', 'feature_set': 'C', 'lookback': 7, 'mean': 26.2406, 'std': 1.0431151901875462}
+[2026-11-07 19:33:29] ====================================================================
+[2026-11-07 19:33:29] STARTING STAGE 3: Optuna HPO (60 Trials, 2 Seeds/Trial)
+[2026-11-07 19:33:29] ====================================================================
+[2026-11-07 19:33:30] Optuna study resuming: 0 already completed, running 60 more trials...
+[2026-11-07 19:51:24] Saved 60 Optuna trials to outputs/results\p6_optuna_trials.csv
+[2026-11-07 19:51:24] [Optuna Best Trial] #10: Val RMSE = 24.850
+[2026-11-07 19:51:24] Best Params: {'units_l1': 80, 'units_l2': 48, 'dropout': 0.15000000000000002, 'recurrent_dropout': 0.2, 'learning_rate': 0.004378795650072225, 'batch_size': 16, 'l2_reg': 1.113741490829352e-06, 'loss_fn': 'huber'}
+[2026-11-07 19:51:24] Re-evaluating best Optuna configuration with 5 seeds...
+[2026-11-07 19:52:06] Stage 2 Winner Val RMSE: 26.241 ± 1.043
+[2026-11-07 19:52:06] Optuna Best 5-Seed Val RMSE: 25.496 ± 0.994 (Median Epochs: 18)
+[2026-11-07 19:52:06] SUCCESS: Optuna configuration beat or matched Stage 2 winner! Adopting Optuna configuration.
+[2026-11-07 19:52:06] Stage 3 Complete in 1116.8s. Selected Config: Arch=CNN_LSTM, FS=C, LB=7, Epochs=18
+[2026-11-07 19:52:06] Saved configuration to outputs/models\dl_config.json
+[2026-11-07 19:52:06] ====================================================================
+[2026-11-07 19:52:06] STAGE 4: Final 1-Day Model Retraining on Train+Val (Epochs=18, 5 Seeds)
+[2026-11-07 19:52:06] ====================================================================
+[2026-11-07 19:52:34] Test 1-Day LSTM Seeds Mean ± Std RMSE: 28.14 ± 0.70
+[2026-11-07 19:52:34] Test 1-Day LSTM Ensemble RMSE: 27.63, MAE: 21.21, R2: 0.6214, QWK: 0.5384
+[2026-11-07 19:52:34] MC Dropout 95% PI Coverage: 37.91%, Mean Width: 31.69
+[2026-11-07 19:52:34] ====================================================================
+[2026-11-07 19:52:34] STAGE 5: 7-Day Direct Multi-Step Model Training (Dense(7), 5 Seeds)
+[2026-11-07 19:52:34] ====================================================================
+[2026-11-07 19:52:37] 7-Day Model Validation Best Epoch: 1
+[2026-11-07 19:52:43] 7-Day LSTM Horizon 1: RMSE = 43.61
+[2026-11-07 19:52:43] 7-Day LSTM Horizon 2: RMSE = 48.02
+[2026-11-07 19:52:43] 7-Day LSTM Horizon 3: RMSE = 52.02
+[2026-11-07 19:52:43] 7-Day LSTM Horizon 4: RMSE = 53.11
+[2026-11-07 19:52:43] 7-Day LSTM Horizon 5: RMSE = 54.73
+[2026-11-07 19:52:43] 7-Day LSTM Horizon 6: RMSE = 52.43
+[2026-11-07 19:52:43] 7-Day LSTM Horizon 7: RMSE = 51.88
+[2026-11-07 19:52:43] ====================================================================
+[2026-11-07 19:52:43] STAGE 6: Hybrid ARIMAX + LSTM Residual Modeling (5 Seeds)
+[2026-11-07 19:52:43] ====================================================================
+[2026-11-07 19:52:50] Hybrid Residual LSTM Best Validation Epoch: 23
+[2026-11-07 19:53:10] Hybrid ARIMAX+LSTM Test RMSE: 26.81, MAE: 19.91, R2: 0.6435
+[2026-11-07 19:53:10] ====================================================================
+[2026-11-07 19:53:10] STAGE 7: Stress-Test Evaluation on COVID-19 Lockdown (Mar–Jun 2020)
+[2026-11-07 19:53:10] ====================================================================
+[2026-11-07 19:53:11] Stress-Test 1-Day LSTM Ensemble: RMSE = 20.28, MAE = 15.40, R2 = 0.0019, QWK = 0.3661
+[2026-11-07 19:53:11] Stress-Test Hybrid ARIMAX+LSTM: RMSE = 15.62, MAE = 9.46, R2 = 0.4080, QWK = 0.2440
+[2026-11-07 19:53:11] All Phase 6 DL stages completed successfully in 2882.8s (48.05 mins)!
+[2026-11-07 19:53:11] Compiling outputs/results/p6_metrics.csv and outputs/results/p6_predictions.csv...
+[2026-11-07 19:53:11] Saved outputs/results/p6_metrics.csv
+[2026-11-07 19:53:11] Saved outputs/results/p6_predictions.csv
+[2026-11-07 19:53:11] Execution times: {'total_time_sec': 2882.8, 'total_time_min': 48.05, 'stage_1_time_sec': 1309.65, 'stage_2_time_sec': 391.18, 'stage_3_time_sec': 1116.78, 'stage_4_time_sec': 27.47, 'stage_5_time_sec': 9.74, 'stage_6_time_sec': 26.89, 'stage_7_time_sec': 1.04}

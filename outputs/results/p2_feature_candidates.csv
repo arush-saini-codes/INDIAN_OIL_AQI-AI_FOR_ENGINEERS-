@@ -1,0 +1,13 @@
+Pollutant,Missing (%),Pearson Corr (AQI),Usable (<30% Missing),Status
+PM2.5,6.2,0.6741,True,Recommended
+PM10,87.86,0.7097,False,Rejected (>30% missing)
+NO,1.91,0.0998,True,Recommended
+NO2,1.91,0.1538,True,Recommended
+NOx,1.91,-0.0003,True,Recommended
+NH3,24.5,0.0075,True,Recommended
+CO,1.33,0.3515,True,Recommended
+SO2,1.91,0.0746,True,Recommended
+O3,2.6,0.2059,True,Recommended
+Benzene,15.11,0.0268,True,Recommended
+Toluene,13.41,0.0891,True,Recommended
+Xylene,100.0,,False,Rejected (>30% missing)

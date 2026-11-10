@@ -1,0 +1,5 @@
+Candidate Series,Description,Start Date,End Date,Modeling Span (Days),Valid AQI Days,Missing AQI (%),Total Missing Gaps,Max Gap (Days),1-Day Gaps,2-7 Day Gaps,8-30 Day Gaps,>30 Day Gaps,Usable Pollutants Count,Usable Pollutants (<30% miss)
+Chennai City-Level (city_day.csv),City-Level CPCB Aggregated,2015-01-01,2020-02-29,1886,1761,6.63,12,82,5,4,2,1,10,"PM2.5, NO, NO2, NOx, NH3, CO, SO2, O3, Benzene, Toluene"
+Manali CPCB (Station TN003),Station TN003 (Manali Refinery Zone),2015-01-01,2020-02-29,1886,1296,31.28,35,411,21,9,3,2,7,"PM2.5, NO, NO2, NOx, NH3, CO, SO2"
+Manali Village (Station TN002),Station TN002 (Manali Village TNPCB),2019-06-19,2020-02-29,256,218,14.84,11,26,8,2,1,0,11,"PM2.5, PM10, NO, NO2, NOx, NH3, CO, SO2, O3, Benzene, Toluene"
+Alandur Bus Depot (Station TN001),Station TN001 (Alandur Bus Depot CPCB),2015-01-01,2020-02-29,1886,1541,18.29,30,149,11,13,4,2,9,"PM2.5, NO, NO2, NOx, CO, SO2, O3, Benzene, Toluene"

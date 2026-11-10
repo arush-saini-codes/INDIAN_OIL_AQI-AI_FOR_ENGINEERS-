@@ -1,0 +1,11 @@
+threshold_label,threshold,model,actual_alerts,predicted_alerts,TP,FP,FN,TN,Precision,Recall,F1
+AQI > 100 (Moderate+),100,Persistence,52,53,34,19,18,111,0.6415,0.6538,0.6476
+AQI > 100 (Moderate+),100,Pure ARIMA,52,54,33,21,19,109,0.6111,0.6346,0.6226
+AQI > 100 (Moderate+),100,ARIMAX,52,62,40,22,12,108,0.6452,0.7692,0.7018
+AQI > 100 (Moderate+),100,LSTM (multivariate),52,83,44,39,8,91,0.5301,0.8462,0.6519
+AQI > 100 (Moderate+),100,Hybrid,52,76,45,31,7,99,0.5921,0.8654,0.7031
+AQI > 200 (Poor+),200,Persistence,10,10,7,3,3,169,0.7,0.7,0.7
+AQI > 200 (Poor+),200,Pure ARIMA,10,5,5,0,5,172,1.0,0.5,0.6667
+AQI > 200 (Poor+),200,ARIMAX,10,7,6,1,4,171,0.8571,0.6,0.7059
+AQI > 200 (Poor+),200,LSTM (multivariate),10,5,4,1,6,171,0.8,0.4,0.5333
+AQI > 200 (Poor+),200,Hybrid,10,7,6,1,4,171,0.8571,0.6,0.7059

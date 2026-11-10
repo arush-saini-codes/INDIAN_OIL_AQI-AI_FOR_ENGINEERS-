@@ -1,0 +1,28 @@
+# Core Numerical & Data Handling (Pinned to NumPy 1.x for TensorFlow & pmdarima binary compatibility)
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+
+# Visualization
+matplotlib==3.8.4
+seaborn==0.13.2
+
+# Classical Machine Learning & Time Series
+scikit-learn==1.5.0
+statsmodels==0.14.2
+pmdarima==2.0.4
+
+# Deep Learning
+tensorflow==2.16.1
+optuna==3.6.1
+
+# Utilities & Data IO
+openpyxl==3.1.5
+joblib==1.6.0
+
+# Interactive Computing & Notebooks
+ipykernel==6.29.5
+jupyter==1.0.0
+nbformat==5.11.1
+nbconvert==7.17.2
+

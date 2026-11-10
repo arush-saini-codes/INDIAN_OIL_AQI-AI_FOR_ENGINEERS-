@@ -1,0 +1,26 @@
+model,rank,date,actual_AQI,predicted_AQI,abs_error,actual_cat,matched_event
+Persistence,1,2019-10-27,306.0,121.0,185.0,Very Poor,Diwali 2019
+Persistence,2,2019-11-04,222.0,91.0,131.0,Poor,No matched event
+Persistence,3,2019-10-29,83.0,208.0,125.0,Satisfactory,No matched event
+Persistence,4,2019-11-12,77.0,192.0,115.0,Satisfactory,No matched event
+Persistence,5,2019-10-28,208.0,306.0,98.0,Poor,Diwali Post-Day
+Pure ARIMA,1,2019-10-27,306.0,111.0,195.0,Very Poor,Diwali 2019
+Pure ARIMA,2,2019-11-04,222.0,95.9,126.1,Poor,No matched event
+Pure ARIMA,3,2020-01-14,230.0,121.0,109.0,Poor,Bhogi 2020
+Pure ARIMA,4,2019-11-07,273.0,181.9,91.1,Poor,No matched event
+Pure ARIMA,5,2019-11-12,77.0,166.6,89.6,Satisfactory,No matched event
+ARIMAX,1,2019-10-27,306.0,165.2,140.8,Very Poor,Diwali 2019
+ARIMAX,2,2020-01-14,230.0,137.8,92.2,Poor,Bhogi 2020
+ARIMAX,3,2019-11-04,222.0,131.6,90.4,Poor,No matched event
+ARIMAX,4,2019-11-12,77.0,149.9,72.9,Satisfactory,No matched event
+ARIMAX,5,2019-11-07,273.0,205.0,68.0,Poor,No matched event
+LSTM (multivariate),1,2019-10-27,306.0,161.3,144.7,Very Poor,Diwali 2019
+LSTM (multivariate),2,2020-01-14,230.0,144.4,85.6,Poor,Bhogi 2020
+LSTM (multivariate),3,2019-11-08,294.0,209.7,84.3,Poor,No matched event
+LSTM (multivariate),4,2019-11-04,222.0,138.3,83.7,Poor,No matched event
+LSTM (multivariate),5,2019-11-07,273.0,197.9,75.1,Poor,No matched event
+Hybrid,1,2019-10-27,306.0,166.6,139.4,Very Poor,Diwali 2019
+Hybrid,2,2019-11-04,222.0,132.3,89.7,Poor,No matched event
+Hybrid,3,2020-01-14,230.0,142.3,87.7,Poor,Bhogi 2020
+Hybrid,4,2019-11-07,273.0,204.0,69.0,Poor,No matched event
+Hybrid,5,2019-11-12,77.0,145.7,68.7,Satisfactory,No matched event

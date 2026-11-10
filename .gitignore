@@ -1,0 +1,38 @@
+# Python & Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Raw Data Files (download separately; see data/raw/README.md)
+data/raw/*.csv
+data/raw/*.zip
+
+# Logs (keep final Phase 6 training log)
+*.log
+!outputs/results/p6_training.log
+
+# Model Checkpoints & Large Binary Artifacts
+outputs/models/*
+!outputs/models/.gitkeep
+!outputs/models/dl_config.json
+
+# IDE & Editor Folders
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db

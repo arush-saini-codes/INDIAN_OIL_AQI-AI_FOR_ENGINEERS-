@@ -1,0 +1,21 @@
+model,category,count,RMSE,MAE,Bias
+Persistence,Satisfactory,127,23.6,14.01,6.07
+Persistence,Moderate,42,30.95,24.86,-10.43
+Persistence,Poor,9,68.31,57.67,-14.56
+Persistence,Very Poor,1,185.0,185.0,-185.0
+Pure ARIMA,Satisfactory,127,19.81,13.87,11.15
+Pure ARIMA,Moderate,42,25.57,20.4,-16.31
+Pure ARIMA,Poor,9,75.94,65.76,-60.82
+Pure ARIMA,Very Poor,1,194.97,194.97,-194.97
+ARIMAX,Satisfactory,127,19.42,15.39,13.09
+ARIMAX,Moderate,42,21.31,16.39,-8.74
+ARIMAX,Poor,9,61.23,55.09,-41.37
+ARIMAX,Very Poor,1,140.81,140.81,-140.81
+LSTM (multivariate),Satisfactory,127,22.19,19.18,18.31
+LSTM (multivariate),Moderate,42,20.64,16.01,-3.92
+LSTM (multivariate),Poor,9,62.86,58.92,-51.15
+LSTM (multivariate),Very Poor,1,144.74,144.74,-144.74
+Hybrid,Satisfactory,127,21.48,17.94,16.58
+Hybrid,Moderate,42,20.08,14.98,-5.02
+Hybrid,Poor,9,60.94,54.87,-42.08
+Hybrid,Very Poor,1,139.41,139.41,-139.41

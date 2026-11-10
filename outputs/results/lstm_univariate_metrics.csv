@@ -1,0 +1,4 @@
+model,split,horizon,RMSE,MAE,MAPE,R2,Accuracy,Macro_F1,QWK
+LSTM (univariate),val,1,29.607,20.034,19.25,0.3473,0.7202,0.2443,0.5216
+LSTM (univariate),test,1,31.729,22.872,25.74,0.5008,0.7088,0.313,0.5226
+LSTM (univariate),stress,1,15.981,12.765,17.16,0.3801,0.8607,0.2493,0.4914

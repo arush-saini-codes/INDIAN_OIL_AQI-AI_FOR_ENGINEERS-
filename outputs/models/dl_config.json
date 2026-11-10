@@ -1,0 +1,23 @@
+{
+    "model_arch": "CNN_LSTM",
+    "feature_set": "C",
+    "lookback": 7,
+    "median_epochs": 18,
+    "hyperparameters": {
+        "units_l1": 80,
+        "units_l2": 48,
+        "dropout": 0.15000000000000002,
+        "recurrent_dropout": 0.2,
+        "learning_rate": 0.004378795650072225,
+        "batch_size": 16,
+        "l2_reg": 1.113741490829352e-06,
+        "loss_fn": "huber"
+    },
+    "seeds": [
+        42,
+        123,
+        456,
+        789,
+        1011
+    ]
+}

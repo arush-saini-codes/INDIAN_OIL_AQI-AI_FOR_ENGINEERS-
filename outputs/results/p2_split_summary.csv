@@ -1,0 +1,5 @@
+Split Partition,Start Date,End Date,Total Days,Valid Days,Missing Days,Missing AQI (%),Mean AQI,Std AQI,Min AQI,Max AQI
+Train,2015-01-01,2018-12-31,1461,1336,125,8.56,122.35,54.8,30.0,449.0
+Validation,2019-01-01,2019-08-31,243,243,0,0.0,103.42,36.72,47.0,283.0
+Test,2019-09-01,2020-02-29,182,182,0,0.0,95.73,45.03,47.0,306.0
+Stress Test,2020-03-01,2020-06-30,122,122,0,0.0,78.81,20.38,50.0,169.0
