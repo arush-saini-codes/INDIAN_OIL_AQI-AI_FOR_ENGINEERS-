@@ -26,3 +26,10 @@ jupyter==1.0.0
 nbformat==5.11.1
 nbconvert==7.17.2
 
+# Deliverables & Document Generation
+python-docx==1.2.0
+python-pptx==1.0.2
+docx2pdf==0.1.8
+pymupdf==2.1
+pywin32==312
+

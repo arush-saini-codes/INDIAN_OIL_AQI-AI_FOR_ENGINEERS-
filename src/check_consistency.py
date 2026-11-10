@@ -190,6 +190,101 @@ def main():
                 mismatches.append(f"In {fpath}: Found {desc} ({len(matches)} occurrences)")
                 print(f"  [FOUND ISSUE] {fpath}: {desc} ({len(matches)}x)")
 
+    # -------------------------------------------------------------
+    # 6. DELIVERABLES AUDIT (REPORT DOCX, PPTX, VIVA GUIDE)
+    # -------------------------------------------------------------
+    print("\n--- 6. Scanning Deliverables (Report, PPTX, Viva Guide) ---")
+    deliverable_texts = {}
+
+    report_path = 'Report/UCS321_AQI_Forecasting_Report.docx'
+    if os.path.exists(report_path):
+        from docx import Document
+        d = Document(report_path)
+        parts = [p.text for p in d.paragraphs]
+        for tbl in d.tables:
+            for row in tbl.rows:
+                parts.append(" | ".join(c.text.strip() for c in row.cells))
+        deliverable_texts['Report (.docx)'] = "\n".join(parts)
+
+    ppt_path = 'Presentation/UCS321_AQI_Forecasting.pptx'
+    if os.path.exists(ppt_path):
+        from pptx import Presentation
+        prs = Presentation(ppt_path)
+        parts = []
+        for si, slide in enumerate(prs.slides, 1):
+            for shp in slide.shapes:
+                if shp.has_text_frame:
+                    parts.append(shp.text_frame.text)
+                if shp.has_table:
+                    for row in shp.table.rows:
+                        parts.append(" | ".join(c.text.strip() for c in row.cells))
+            if slide.has_notes_slide:
+                parts.append(slide.notes_slide.notes_text_frame.text)
+        deliverable_texts['Presentation (.pptx)'] = "\n".join(parts)
+
+    viva_path = 'PROJECT_MASTER_GUIDE_AND_VIVA_PREP.md'
+    if os.path.exists(viva_path):
+        with open(viva_path, 'r', encoding='utf-8') as vf:
+            deliverable_texts['Viva Guide (.md)'] = vf.read()
+
+    banned_words = [
+        (r'\bproves\b', 'banned word: proves'),
+        (r'\bdecisively\b', 'banned word: decisively'),
+        (r'\bguaranteed\b', 'banned word: guaranteed'),
+        (r'\bconfirms\b', 'banned word: confirms'),
+    ]
+    inconsistent_nums = [
+        (r'\b68\.2\b', 'outdated stress mean 68.2 (should be 78.81)'),
+        (r'\b30\.11\b', 'outdated leaked 7day h=1 RMSE 30.11 (should be 40.39)'),
+        (r'\b57\.75\b', 'outdated leaked 7day h=7 RMSE 57.75 (should be 53.04)'),
+        (r'\b60\.61\b', 'outdated persistence h=7 RMSE 60.61 (should be 61.16)'),
+        (r'\b120\.30\b', 'outdated train mean 120.30 (should be 112.86)'),
+        (r'\b91\.24\b', 'outdated val mean 91.24 (should be 103.42)'),
+        (r'\b102\.48\b', 'outdated test mean 102.48 (should be 95.73)'),
+        (r'\b21\.61\b', 'outdated univariate LSTM stress RMSE 21.61 (should be 15.98)'),
+    ]
+
+    for label, txt in deliverable_texts.items():
+        issues_here = 0
+        for pat, desc in banned_words + inconsistent_nums:
+            hits = re.findall(pat, txt, re.IGNORECASE)
+            if hits:
+                issues_here += 1
+                mismatches.append(f"In {label}: {desc} ({len(hits)}x)")
+                print(f"  [FOUND ISSUE] {label}: {desc} ({len(hits)}x)")
+        if issues_here == 0:
+            print(f"  {label:22s}: 0 banned words, 0 inconsistent numbers | OK")
+
+    # Verify all headline numbers from FINAL_NUMBERS.md appear in Report
+    if 'Report (.docx)' in deliverable_texts and os.path.exists('docs/FINAL_NUMBERS.md'):
+        with open('docs/FINAL_NUMBERS.md', 'r', encoding='utf-8') as fnf:
+            fn_txt = fnf.read()
+        headline_nums = [
+            '25.97', '18.45', '0.6657', '76.92', '0.6471',
+            '26.81', '19.91', '0.6435', '74.73',
+            '27.63', '21.21', '0.6214', '68.68',
+            '30.58', '19.23', '31.73', '22.87', '32.10', '19.56',
+            '13.51', '14.45', '15.62', '15.98', '17.74', '20.28',
+            '78.81', '112.86', '103.42', '95.73',
+            '40.39', '56.08', '54.48', '53.04', '61.16', '50.35',
+            '0.0001', '0.0132', '0.0297', '0.0127', '0.0758',
+            '96.70', '96.15', '37.91', '63.87', '57.71',
+            '-1.15', '-0.31', '-3.19', '+7.84', '-8.32', '+10.55',
+            '-140.78', '-92.20'
+        ]
+        rep_txt = deliverable_texts['Report (.docx)']
+        missing_in_rep = [num for num in headline_nums if num not in rep_txt]
+        missing_in_fn = [num for num in headline_nums if num.lstrip('+') not in fn_txt and num not in fn_txt]
+        if missing_in_rep or missing_in_fn:
+            if missing_in_rep:
+                mismatches.append(f"Report missing headline numbers: {missing_in_rep}")
+                print(f"  [FOUND ISSUE] Missing in Report: {missing_in_rep}")
+            if missing_in_fn:
+                mismatches.append(f"FINAL_NUMBERS missing headline numbers: {missing_in_fn}")
+                print(f"  [FOUND ISSUE] Missing in FINAL_NUMBERS: {missing_in_fn}")
+        else:
+            print(f"  Report Headline Check : All {len(headline_nums)} headline numbers verified against FINAL_NUMBERS.md | OK")
+
     # Summary
     print("\n" + "=" * 70)
     if mismatches:
